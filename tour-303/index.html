@@ -29,7 +29,7 @@
            background: rgba(31,32,28,.86); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
            border: 1px solid rgba(255,229,212,.14); border-radius: 20px; padding: 14px; }
   .rooms { display: flex; gap: 8px; margin-bottom: 12px; }
-  .rooms button { flex: 1; font: inherit; font-size: 13px; font-weight: 600; padding: 10px 12px; border-radius: 999px; cursor: pointer;
+  .rooms button { flex: 1; white-space: nowrap; font: inherit; font-size: 13px; font-weight: 600; padding: 10px 12px; border-radius: 999px; cursor: pointer;
                   border: 1px solid rgba(255,229,212,.25); background: transparent; color: var(--peach); transition: .2s; }
   .rooms button[aria-pressed="true"] { background: var(--peach); color: var(--ink); border-color: var(--peach); }
   .map { position: relative; border-radius: 12px; overflow: hidden; background: #fff; }
@@ -109,7 +109,8 @@
 (function () {
   // Pontos do tour. x/y = posição na planta (0–1). yaw/pitch dos hotspots em graus (Pannellum).
   var ROOMS = [
-    { id: 'living', label: 'Living e jantar', x: 0.442, y: 0.326, yaw: 0, links: [{ to: 'cozinha', label: 'Cozinha', yaw: -106, pitch: -19 }] },
+    { id: 'terraco', label: 'Terraço', x: 0.725, y: 0.333, yaw: 60, links: [{ to: 'living', label: 'Living', yaw: 1, pitch: -11 }] },
+    { id: 'living', label: 'Living e jantar', x: 0.442, y: 0.326, yaw: 0, links: [{ to: 'cozinha', label: 'Cozinha', yaw: -106, pitch: -19 }, { to: 'terraco', label: 'Terraço', yaw: 179, pitch: -11 }] },
     { id: 'cozinha', label: 'Cozinha', x: 0.477, y: 0.545, yaw: 20, links: [{ to: 'living', label: 'Living', yaw: 74, pitch: -19 }] }
   ];
   function src(id) { return 'img/' + id + '.webp'; }
@@ -125,7 +126,7 @@
     };
   });
   var viewer = pannellum.viewer('pano', {
-    default: { firstScene: 'living', sceneFadeDuration: 900, autoLoad: true, showControls: true, compass: false, minHfov: 50, maxHfov: 115, mouseZoom: true, keyboardZoom: true },
+    default: { firstScene: 'terraco', sceneFadeDuration: 900, autoLoad: true, showControls: true, compass: false, minHfov: 50, maxHfov: 115, mouseZoom: true, keyboardZoom: true },
     scenes: scenes
   });
 

@@ -340,11 +340,11 @@ def wall_y(y, x0, x1, openings=(), side=-1, m=None):
         if zt < H: box('verga', a, b, ya, yb, zt, H, m or M['wall'])
         if zb > 0: box('peitoril', a, b, ya, yb, 0, zb, m or M['wall'])
 
-DOOR_H = 2.55
+DOOR_H = 2.60   # esquadrias 2,60 m de altura (DWG)
 # fachada frontal (y=0): esquadria de piso a teto ao longo do living
 wall_y(0.0, -0.15, 4.9, openings=[(0.25, 4.5, DOOR_H, 0)])
 # lateral direita (x=4.75): vidro para a varanda gourmet
-wall_x(4.75, 0.0, 7.35, openings=[(0.9, 4.25, DOOR_H, 0)], side=1)
+wall_x(4.75, 0.0, 7.35, openings=[(0.75, 4.35, DOOR_H, 0)], side=1)   # porta 3,60 m (DWG)
 # nicho da cozinha / shaft
 wall_y(7.35, 4.75, 5.9, side=-1)
 wall_x(5.9, 7.35, 9.05, side=1)
@@ -380,22 +380,140 @@ def slider_x(x, y0, y1, n):
     box('vidro', x + 0.04, x + 0.05, y0, y1, 0.02, DOOR_H - 0.05, M['glass'])
 
 slider_y(0.0, 0.25, 4.5, 4)
-slider_x(4.75, 0.9, 4.25, 3)
+slider_x(4.75, 0.75, 4.35, 3)
 
-# ---- exterior: varanda frontal e varanda gourmet/solarium
-box('varanda_frontal', -1.6, 6.0, -1.55, -0.15, -0.06, -0.01, M['ext_floor'])
-box('forro_varanda', -1.6, 6.0, -1.55, -0.15, H, H + 0.05, M['ceiling'])
-box('guarda_corpo', -1.6, 6.0, -1.55, -1.53, 0, 1.1, M['glass'])
-box('corrimao', -1.6, 6.0, -1.56, -1.52, 1.1, 1.13, M['steel'])
-box('terraco', 4.9, 13.0, -1.55, 9.0, -0.06, -0.01, M['ext_floor'])
-box('guarda_corpo_terraco', 12.98, 13.0, -1.55, 9.0, 0, 1.1, M['glass'])
-box('corrimao_terraco', 12.97, 13.01, -1.55, 9.0, 1.1, 1.13, M['steel'])
-box('beiral_terraco', 4.9, 8.5, -1.55, 9.0, H, H + 0.25, M['plaster_white'])
-box('forro_terraco', 4.9, 8.5, -1.55, 9.0, H - 0.02, H, M['ceiling'])
-# mesa da varanda gourmet (planta: mesa 10 lugares)
-box('mesa_gourmet', 6.2, 7.2, 0.9, 3.4, 0.72, 0.77, M['wood_dark'], bevel=0.01)
-for yy in (1.1, 3.2):
-    box('pe_mesa_g', 6.3, 7.1, yy - 0.05, yy + 0.05, 0, 0.72, M['black'])
+# planta grande no canto (costela-de-adão/ave-do-paraíso)
+def plant(x, y, h=1.6, n=14):
+    cyl('vaso_planta', x, y, 0, 0.45, 0.22, M['pot'])
+    for i in range(n):
+        a = random.uniform(0, 2 * math.pi); r = random.uniform(0.1, 0.35)
+        z = random.uniform(0.7, h)
+        lf = sphere('folha', x + r * math.cos(a), y + r * math.sin(a), z, 0.2, M['leaf'], scale=(1.6, 0.7, 0.06))
+        lf.rotation_euler = (random.uniform(-0.6, 0.6), random.uniform(-0.5, 0.5), a)
+        stem_h = z - 0.45
+        cyl('haste', x + r * 0.5 * math.cos(a), y + r * 0.5 * math.sin(a), 0.45, 0.45 + stem_h, 0.008, M['leaf'])
+
+# ---- exterior (planta 303): varanda frontal + área gourmet coberta + solarium + deck com jacuzzi
+def prism(name, pts, z0, z1, m):
+    """Prisma a partir de polígono em coordenadas de planta (x, y para baixo)."""
+    import bmesh
+    me = bpy.data.meshes.new(name); o = bpy.data.objects.new(name, me); col.objects.link(o)
+    bm = bmesh.new()
+    vs = [bm.verts.new((x, -y, z0)) for x, y in pts]
+    f = bm.faces.new(vs if _ccw(pts) else vs[::-1])
+    r = bmesh.ops.extrude_face_region(bm, geom=[f])
+    bmesh.ops.translate(bm, verts=[e for e in r['geom'] if isinstance(e, bmesh.types.BMVert)], vec=(0, 0, z1 - z0))
+    bm.normal_update(); bm.to_mesh(me); bm.free()
+    o.data.materials.append(m)
+    return o
+def _ccw(pts):
+    a = sum(pts[i][0] * -pts[(i + 1) % len(pts)][1] - pts[(i + 1) % len(pts)][0] * -pts[i][1] for i in range(len(pts)))
+    return a > 0
+
+M['deck'] = node_mat('deck', wood_build('#a0693e', '#7a4a2a', scale=(1, 14, 1), gloss=0.55))
+M['porc_dark'] = mat('porcelanato_externo_escuro', srgb('#9a968f'), 0.55)
+M['porc_light'] = mat('porcelanato_externo_claro', srgb('#d9d6d0'), 0.6)
+M['white'] = mat('pintura_branca', srgb('#f1efeb'), 0.8)
+M['water'] = mat('agua', srgb('#8fd3dc'), 0.02, **{'Transmission Weight': 0.9, 'IOR': 1.33})
+M['outdoor'] = node_mat('tecido_externo', velvet('#c9bfae'))
+M['stone'] = mat('pedra', srgb('#8d8a84'), 0.8)
+
+# borda inclinada do deck: x = 13.6 em y=-1.3 até x = 14.85 em y=9.0
+def edge_x(y): return 13.6 + (y + 1.3) * (1.25 / 10.3)
+TOP, BOT = -1.3, 9.05
+
+# varanda frontal das suítes/living
+box('varanda_frontal', -1.6, 4.75, -1.3, -0.15, -0.06, -0.01, M['porc_dark'])
+box('forro_varanda', -1.6, 4.75, -1.3, -0.15, H, H + 0.05, M['ceiling'])
+# área gourmet coberta (piso escuro) x 4.75–8.25
+box('piso_gourmet', 4.75, 8.65, TOP, BOT, -0.06, -0.01, M['porc_dark'])
+# solarium descoberto (piso claro) x 8.25–11.0
+box('piso_solarium', 8.65, 11.0, TOP, BOT, -0.06, -0.01, M['porc_light'])
+# deck de madeira (com recorte da planta em x 11.0–11.75 abaixo de y 3.9)
+prism('deck_madeira', [(11.0, TOP), (edge_x(TOP), TOP), (edge_x(BOT), BOT), (11.75, BOT), (11.75, 3.9), (11.0, 3.9)], -0.06, 0.0, M['deck'])
+prism('solarium_recorte', [(11.0, 3.9), (11.75, 3.9), (11.75, BOT), (11.0, BOT)], -0.06, -0.01, M['porc_light'])
+# laje de cobertura da área gourmet (com forro de madeira) e beiral
+box('laje_gourmet', 4.75, 8.75, TOP - 0.2, BOT, H, H + 0.3, M['white'])
+box('forro_gourmet', 4.75, 8.65, TOP, BOT, H - 0.02, H, M['ceiling'])
+# colunas redondas brancas na borda da cobertura (como nas fotos)
+for yy in (-0.9, 3.9, 8.6):
+    cyl('coluna', 8.5, yy, 0, H, 0.13, M['white'])
+# platibanda + guarda-corpo de vidro na frente e na borda inclinada
+box('mureta_frente', 4.75, edge_x(TOP), TOP - 0.2, TOP, 0, 0.35, M['white'])
+box('vidro_frente', 4.75, edge_x(TOP), TOP - 0.12, TOP - 0.1, 0.35, 1.25, M['glass'])
+box('corrimao_frente', 4.75, edge_x(TOP), TOP - 0.13, TOP - 0.09, 1.25, 1.28, M['steel'])
+prism('mureta_lateral', [(edge_x(TOP), TOP), (edge_x(TOP) + 0.2, TOP), (edge_x(BOT) + 0.2, BOT), (edge_x(BOT), BOT)], 0, 0.35, M['white'])
+prism('vidro_lateral', [(edge_x(TOP) + 0.09, TOP), (edge_x(TOP) + 0.11, TOP), (edge_x(BOT) + 0.11, BOT), (edge_x(BOT) + 0.09, BOT)], 0.35, 1.25, M['glass'])
+prism('corrimao_lateral', [(edge_x(TOP) + 0.08, TOP), (edge_x(TOP) + 0.12, TOP), (edge_x(BOT) + 0.12, BOT), (edge_x(BOT) + 0.08, BOT)], 1.25, 1.28, M['steel'])
+# muro dos fundos (divisa) com painel de pedra, como na foto
+box('muro_fundos', 5.9, edge_x(BOT) + 0.2, BOT, BOT + 0.2, 0, 2.1, M['white'])
+box('painel_pedra', 11.2, 12.0, BOT - 0.02, BOT, 0.2, 2.1, M['stone'])
+# jardineira no fim do deck
+box('jardineira', 11.8, edge_x(8.4) - 0.05, 8.4, 8.95, 0, 0.45, M['white'])
+for k in range(16):
+    sphere('arbusto', 11.95 + k * 0.17, 8.68, 0.5, 0.18, M['leaf'], scale=(1, 1, 0.7))
+
+# --- área gourmet coberta: mesa de 10 lugares + bancada em L com cuba e churrasqueira
+GX0, GX1, GY0, GY1 = 6.05, 7.05, 0.95, 3.6
+box('mesa_gourmet', GX0, GX1, GY0, GY1, 0.72, 0.77, M['wood_dark'], bevel=0.01)
+for yy in (1.3, 3.25):
+    box('pe_mesa_g', GX0 + 0.15, GX1 - 0.15, yy - 0.05, yy + 0.05, 0, 0.72, M['black'])
+for i in range(4):
+    yy = 1.3 + i * 0.63
+    for side in (-1, 1):
+        cx = (GX0 + GX1) / 2 + side * 0.72
+        box('cadeira_g', cx - 0.22, cx + 0.22, yy - 0.22, yy + 0.22, 0.44, 0.49, M['cane'], bevel=0.01)
+        bx = cx + side * 0.2
+        box('cadeira_g_enc', bx - 0.025, bx + 0.025, yy - 0.21, yy + 0.21, 0.49, 0.85, M['cane'], bevel=0.01)
+        for (px_, py_) in ((-0.19, -0.19), (0.19, -0.19), (-0.19, 0.19), (0.19, 0.19)):
+            box('cadeira_g_pe', cx + px_ - 0.017, cx + px_ + 0.017, yy + py_ - 0.017, yy + py_ + 0.017, 0, 0.44, M['wood'])
+for yy in (GY0 - 0.3, GY1 + 0.3):
+    cx = (GX0 + GX1) / 2
+    box('cadeira_g_cab', cx - 0.22, cx + 0.22, yy - 0.22, yy + 0.22, 0.44, 0.49, M['cane'], bevel=0.01)
+cyl('centro_mesa_g', 6.55, 2.25, 0.77, 0.83, 0.2, M['ceramic'])
+sphere('pendente_g1', 6.55, 1.7, 2.0, 0.26, M['cane'], scale=(1, 1, 0.8))
+sphere('pendente_g2', 6.55, 2.9, 2.0, 0.26, M['cane'], scale=(1, 1, 0.8))
+for yy in (1.7, 2.9):
+    cyl('fio_g', 6.55, yy, 2.2, H, 0.004, M['black'])
+# bancada em L (mármore) com cuba; parte junto à parede do nicho e parte com banquetas
+box('bancada_g_parede', 5.9, 7.45, 6.95, 7.35, 0, 0.92, M['marble'])
+box('bancada_g_ilha', 6.1, 6.9, 4.55, 7.35, 0, 0.92, M['marble'])
+box('tampo_madeira_g', 6.9, 7.45, 4.55, 7.35, 0.92, 0.96, M['wood_dark'])
+box('base_tampo', 6.9, 6.95, 4.55, 7.35, 0, 0.92, M['wood_dark'])
+box('cuba_g', 6.25, 6.75, 5.2, 5.9, 0.85, 0.921, M['steel'])
+cyl('torneira_g', 6.2, 5.55, 0.92, 1.2, 0.015, M['steel'])
+box('churrasqueira', 5.95, 6.55, 7.0, 7.34, 0.92, 1.05, M['black'])
+for yy in (4.9, 5.55, 6.2, 6.85):
+    cyl('banqueta_g', 7.65, yy, 0.72, 0.76, 0.19, M['wood'])
+    box('banqueta_g_enc', 7.86, 7.89, yy - 0.16, yy + 0.16, 0.76, 0.95, M['wood'])
+    cyl('banqueta_g_pe', 7.7, yy, 0.0, 0.72, 0.02, M['black'])
+plant(5.4, 8.0, h=1.4, n=10)
+
+# --- solarium: lounge (sofá + 4 poltronas + mesa de centro) e 2 chaises
+box('sofa_ext', 10.2, 10.95, 0.05, 1.95, 0.1, 0.42, M['outdoor'], bevel=0.04)
+box('sofa_ext_enc', 10.75, 10.95, 0.05, 1.95, 0.42, 0.8, M['outdoor'], bevel=0.05)
+for (x, y) in ((9.05, -0.55), (9.8, -0.55), (9.05, 2.4), (9.8, 2.4)):
+    box('poltrona_ext', x - 0.32, x + 0.32, y - 0.32, y + 0.32, 0.1, 0.42, M['outdoor'], bevel=0.04)
+    back = y - 0.3 if y < 1 else y + 0.3
+    box('poltrona_ext_enc', x - 0.32, x + 0.32, back - 0.07, back + 0.07, 0.42, 0.75, M['outdoor'], bevel=0.04)
+box('mesa_centro_ext', 9.2, 9.6, 0.35, 1.3, 0.3, 0.38, M['wood'], bevel=0.01)
+box('mesa_lateral_ext', 10.3, 10.65, 2.2, 2.55, 0, 0.42, M['wood'])
+plant(10.75, -0.75, h=1.1, n=9)
+for y0 in (4.35, 5.55):
+    box('chaise', 9.3, 11.0, y0, y0 + 0.8, 0.12, 0.38, M['outdoor'], bevel=0.04)
+    enc = box('chaise_enc', 10.55, 11.0, y0, y0 + 0.8, 0.38, 0.7, M['outdoor'], bevel=0.04)
+    box('chaise_base', 9.35, 10.95, y0 + 0.05, y0 + 0.75, 0, 0.12, M['wood'])
+cyl('mesinha_chaise', 10.2, 5.3, 0, 0.45, 0.14, M['wood'])
+
+# --- deck: jacuzzi + 3 espreguiçadeiras
+box('jacuzzi_borda', 11.15, 13.05, -0.75, 1.45, 0.0, 0.55, M['white'])
+box('jacuzzi_agua', 11.3, 12.9, -0.6, 1.3, 0.3, 0.5, M['water'])
+for y0 in (2.6, 3.85, 5.25):
+    x0 = 12.2 + (y0 - 2.6) * 0.1
+    box('espreg', x0, x0 + 1.9, y0, y0 + 0.72, 0.18, 0.34, M['navy'], bevel=0.03)
+    box('espreg_enc', x0 + 1.4, x0 + 1.9, y0, y0 + 0.72, 0.34, 0.72, M['navy'], bevel=0.03)
+    box('espreg_base', x0 + 0.05, x0 + 1.85, y0 + 0.04, y0 + 0.68, 0, 0.18, M['steel'])
+cyl('mesinha_deck', 13.35, 4.9, 0, 0.45, 0.2, M['wood'])
 
 # fundos com fotos reais da vista da 303 (sem IA)
 def backdrop(name, path, center, size, rot_z, crop=None, strength=1.0):
@@ -421,10 +539,12 @@ def backdrop(name, path, center, size, rot_z, crop=None, strength=1.0):
     o.visible_shadow = False
     return o
 
-VIEW_A = os.path.join(ORIG, 'WhatsApp-Image-2026-02-09-at-11.46.07.jpeg')    # baía (varanda)
-VIEW_B = os.path.join(ORIG, 'WhatsApp-Image-2026-02-09-at-11.46.10-3.jpeg')  # baía + morro (solarium)
-backdrop('vista_frente', VIEW_A, (2.4, 32.0, 6.0), (70, 32), 180, crop=(0.2, 0.0, 0.95, 0.72), strength=1.15)
-backdrop('vista_lateral', VIEW_B, (45.0, -4.0, 5.0), (80, 36), 90, crop=(0.55, 0.15, 1.0, 0.85), strength=1.15)
+VIEW_BAIA = os.path.join(ORIG, 'WhatsApp-Image-2026-02-09-at-11.46.10-3.jpeg')   # do solarium, olhando para a frente: baía + morro
+VIEW_JARDIM = os.path.join(ORIG, 'WhatsApp-Image-2026-02-09-at-11.46.10.jpeg')   # do solarium, olhando para a lateral: jardins + serra
+# fotos reais em planos distantes (~45 m), horizonte na altura dos olhos
+backdrop('vista_frente', VIEW_BAIA, (9.0, 45.0, 1.0), (100, 70.3), 180, crop=(0.2, 0.0, 1.0, 1.0), strength=1.15)
+backdrop('vista_lateral', VIEW_JARDIM, (55.0, -3.0, 1.0), (110, 68.8), 90, crop=(0.08, 0.0, 1.0, 1.0), strength=1.15)
+backdrop('vista_fundos', VIEW_JARDIM, (9.0, -55.0, 1.0), (110, 68.8), 0, crop=(0.0, 0.0, 0.85, 1.0), strength=1.0)
 
 # ================================================================== LIVING
 # parede da TV: ripado de madeira em toda a parede esquerda do living
@@ -499,16 +619,6 @@ shade = bpy.context.active_object; shade.name = 'luminaria_cupula'
 sol = shade.modifiers.new('espessura', 'SOLIDIFY'); sol.thickness = 0.004
 shade.data.materials.append(M['black']); bpy.ops.object.shade_smooth()
 
-# planta grande no canto (costela-de-adão/ave-do-paraíso)
-def plant(x, y, h=1.6, n=14):
-    cyl('vaso_planta', x, y, 0, 0.45, 0.22, M['pot'])
-    for i in range(n):
-        a = random.uniform(0, 2 * math.pi); r = random.uniform(0.1, 0.35)
-        z = random.uniform(0.7, h)
-        lf = sphere('folha', x + r * math.cos(a), y + r * math.sin(a), z, 0.2, M['leaf'], scale=(1.6, 0.7, 0.06))
-        lf.rotation_euler = (random.uniform(-0.6, 0.6), random.uniform(-0.5, 0.5), a)
-        stem_h = z - 0.45
-        cyl('haste', x + r * 0.5 * math.cos(a), y + r * 0.5 * math.sin(a), 0.45, 0.45 + stem_h, 0.008, M['leaf'])
 plant(4.35, 0.45)
 plant(0.45, 4.5, h=1.3, n=10)
 
@@ -614,12 +724,12 @@ sun = bpy.context.active_object
 sun.data.energy = 5.5
 sun.data.angle = math.radians(1.5)
 sun.data.color = (1.0, 0.86, 0.7)
-sun.rotation_euler = (math.radians(62), 0, math.radians(75))
+sun.rotation_euler = (math.radians(55), 0, math.radians(80))   # sol de fim de tarde vindo de noroeste (norte do DWG)
 
 world = bpy.data.worlds.new('ceu'); scene.world = world
 world.use_nodes = True
 bg = world.node_tree.nodes['Background']
-bg.inputs['Color'].default_value = (*srgb('#9ec3e6'), 1)
+bg.inputs['Color'].default_value = (*srgb('#6fa3dc'), 1)
 bg.inputs['Strength'].default_value = 2.2
 
 # portais de luz nas esquadrias
@@ -630,7 +740,7 @@ def portal(loc, size, rot):
     p.data.cycles.is_portal = True
     p.rotation_euler = rot
 portal((2.375, 0.05, 1.28), (4.3, 2.55), (math.radians(90), 0, 0))
-portal((4.85, -2.575, 1.28), (3.4, 2.55), (math.radians(90), 0, math.radians(90)))
+portal((4.85, -2.55, 1.3), (3.6, 2.6), (math.radians(90), 0, math.radians(90)))
 
 # spots embutidos no forro (luz quente 3000K)
 spots = [(x, y) for x in (0.9, 2.2, 3.5) for y in (1.0, 2.4, 3.8)] + \
@@ -723,6 +833,8 @@ SHOTS = {
     # panoramas 360: câmera na altura dos olhos (1,60 m); yaw 90 = olhando para a fachada (y planta negativo)
     'living_360':  dict(loc=(1.95, 2.8, 1.6), rot=(90, 0, 90), pano=True),
     'cozinha_360': dict(loc=(2.9, 6.1, 1.6), rot=(90, 0, 90), pano=True),
+    'terraco_360': dict(loc=(9.7, 2.9, 1.6), rot=(90, 0, 90), pano=True, exposure=-0.6),
+    'deck_360':    dict(loc=(12.0, 3.0, 1.6), rot=(90, 0, 90), pano=True, exposure=-0.6),
     # perspectivas (para refinamento na Higgsfield e comparação)
     'living_persp':  dict(loc=(4.2, 4.6, 1.35), rot=(84, 0, 128), lens=16),
     'cozinha_persp': dict(loc=(0.9, 5.6, 1.4), rot=(80, 0, -145), lens=17),
@@ -731,6 +843,7 @@ for name, s in SHOTS.items():
     if ONLY and name not in ONLY:
         continue
     cam = camera(name, s['loc'], s['rot'], s.get('pano', False), s.get('lens', 20))
+    scene.view_settings.exposure = s.get('exposure', 1.1)
     scene.camera = cam
     if s.get('pano'):
         scene.render.resolution_x, scene.render.resolution_y = RES, RES // 2
