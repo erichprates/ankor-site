@@ -14,6 +14,7 @@ Ankor Exclusive Residence, no Itaguá, em Ubatuba. Ele foi refeito a partir do s
 | Cobertura 304 | https://erichprates.github.io/ankor-site/cobertura-304/ |
 | Repositório | https://github.com/erichprates/ankor-site (público, exigência do GitHub Pages gratuito) |
 | Pasta local | `~/Documents/Sites/Ankor` |
+| Backup das fotos originais | https://github.com/erichprates/ankor-originais (**privado**). Restaurar: `git clone https://github.com/erichprates/ankor-originais.git _originais` |
 | Status | **Enviado ao cliente para aprovação em 28/09/2026.** Aguardando considerações. |
 
 ---
@@ -33,7 +34,7 @@ assets/img/                    Fotos otimizadas em WebP
   empreendimento/ lazer/ localizacao/ coberturas/ vista/ plantas/ videos/
 assets/brand/                  Logo Ankor (PNG) e logo Convênio (SVG)
 _ferramentas/                  Scripts que geram imagens e landing pages (ver seção 4)
-_originais/                    Fotos em tamanho original. FICA SÓ NO COMPUTADOR (fora do Git, ~104 MB)
+_originais/                    Fotos em tamanho original (~104 MB). Fora deste repositório; backup no repo privado ankor-originais
 ```
 
 ---
@@ -110,7 +111,9 @@ python3 _ferramentas/gerar_landing_pages.py
 ```
 
 ### Fotos
-As fotos em tamanho original ficam em `_originais/`. Para trocar ou adicionar:
+As fotos em tamanho original ficam em `_originais/`, que é um repositório Git próprio (backup privado).
+Depois de adicionar ou trocar originais, atualize o backup: `cd _originais && git add -A && git commit -m "..." && git push`.
+Para trocar ou adicionar:
 1. coloque o arquivo em `_originais/` (para substituir, use o mesmo nome);
 2. se for foto nova, adicione uma linha na lista `M` de `_ferramentas/gerar_imagens.py`
    (arquivo, slug, categoria, legenda, unidade);
