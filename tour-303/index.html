@@ -58,13 +58,25 @@
   .pnlm-load-box { background: rgba(31,32,28,.9); border-radius: 14px; }
   .pnlm-controls-container { top: 90px; }
   .pnlm-panorama-info { display: none !important; }
-  @media (max-width: 700px) {
-    .brand img { width: 110px; } .brand a { display: none; }
-    .note { display: none; }
-    .panel { width: calc(100vw - 24px); }
-    .map { display: none; }
-    .rooms { margin-bottom: 10px; }
-    .hint { top: 40%; }
+  /* Celular: o tour roda só na horizontal */
+  .rotate { position: fixed; inset: 0; z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+            background: var(--ink-deep); color: var(--peach); text-align: center; padding: 24px; }
+  .rotate svg { width: 72px; height: 72px; color: var(--copper-light); animation: turn 2.4s ease-in-out infinite; }
+  .rotate strong { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 30px; }
+  .rotate span { font-size: 14px; color: rgba(255,229,212,.7); }
+  @keyframes turn { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
+  @media (orientation: portrait) and (pointer: coarse) and (max-width: 900px) { .rotate { display: flex; } }
+  /* celular deitado: interface compacta */
+  @media (max-height: 520px) {
+    .top { padding: 10px 16px; }
+    .brand img { width: 104px; } .brand a { display: none; }
+    .title small { font-size: 9px; } .title strong { font-size: 20px; }
+    .note, .map { display: none; }
+    .panel { width: auto; padding: 8px; left: 12px; bottom: 12px; }
+    .rooms { margin: 0; }
+    .rooms button { padding: 8px 14px; font-size: 12px; white-space: nowrap; }
+    .pnlm-controls-container { top: 64px; }
+    .hint { font-size: 13px; }
   }
 </style>
 </head>
@@ -82,18 +94,15 @@
 <aside class="panel" aria-label="Ambientes">
   <div class="rooms" id="rooms"></div>
   <div class="map" id="map"><img src="../assets/img/plantas/planta-303.webp" alt="Planta da Cobertura 303 com os pontos do tour"></div>
-  <div class="mode" id="mode" hidden>
-    <span>Versão</span>
-    <div class="switch" role="group" aria-label="Versão da imagem">
-      <button type="button" data-v="render" aria-pressed="false">Render 3D</button>
-      <button type="button" data-v="ia" aria-pressed="true">IA faces</button>
-      <button type="button" data-v="ia1" aria-pressed="false">IA única</button>
-    </div>
-  </div>
 </aside>
 
 <p class="note">Imagens ilustrativas geradas a partir da planta da unidade (pé-direito 2,80 m). Mobiliário e decoração são sugestões e não fazem parte da entrega. A vista pelas janelas usa fotos reais tiradas da cobertura.</p>
 <div class="hint" id="hint">Arraste para olhar em volta</div>
+<div class="rotate" aria-live="polite">
+  <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="8" width="24" height="42" rx="4"/><path d="M29 44h6"/><path d="M50 40a18 18 0 0 1-14 16"/><path d="M40 52l-4 4 4 4" /></svg>
+  <strong>Gire o celular</strong>
+  <span>O tour 360° funciona na horizontal.</span>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js"></script>
 <script>
@@ -103,10 +112,7 @@
     { id: 'living', label: 'Living e jantar', x: 0.442, y: 0.326, yaw: 0, links: [{ to: 'cozinha', label: 'Cozinha', yaw: -106, pitch: -19 }] },
     { id: 'cozinha', label: 'Cozinha', x: 0.477, y: 0.545, yaw: 20, links: [{ to: 'living', label: 'Living', yaw: 74, pitch: -19 }] }
   ];
-  var VERSIONS = ['render', 'ia', 'ia1'];   // arquivos: img/<ambiente>_<versão>.webp
-  var HAS_IA = { living: true, cozinha: true };
-  var version = 'ia';
-  function src(id) { return 'img/' + id + '_' + version + '.webp'; }
+  function src(id) { return 'img/' + id + '.webp'; }
 
   var scenes = {};
   ROOMS.forEach(function (r) {
@@ -138,21 +144,10 @@
   }
   viewer.on('scenechange', sync); viewer.on('load', sync);
 
-  // Alternar entre render puro do Blender e versão refinada (quando existir)
-  if (Object.keys(HAS_IA).some(function (k) { return HAS_IA[k]; })) {
-    var mode = document.getElementById('mode'); mode.hidden = false;
-    mode.addEventListener('click', function (e) {
-      var b = e.target.closest('button[data-v]'); if (!b) return;
-      version = b.dataset.v;
-      mode.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
-      var cur = viewer.getScene(), yaw = viewer.getYaw(), pitch = viewer.getPitch(), hfov = viewer.getHfov();
-      ROOMS.forEach(function (r) { scenes[r.id].panorama = src(r.id); });
-      viewer.destroy();
-      viewer = pannellum.viewer('pano', { default: { firstScene: cur, sceneFadeDuration: 900, autoLoad: true, minHfov: 50, maxHfov: 115 }, scenes: scenes });
-      viewer.on('load', function () { viewer.setYaw(yaw, false); viewer.setPitch(pitch, false); viewer.setHfov(hfov, false); sync(); });
-      viewer.on('scenechange', sync);
-    });
-  }
+  // Em tela cheia no celular, tenta travar na horizontal (Android; no iPhone o aviso de girar cobre o caso)
+  document.addEventListener('fullscreenchange', function () {
+    if (document.fullscreenElement && screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function () {});
+  });
   var hint = document.getElementById('hint');
   ['mousedown', 'touchstart', 'keydown'].forEach(function (ev) { document.addEventListener(ev, function () { hint.classList.add('is-hidden'); }, { once: true }); });
   setTimeout(function () { hint.classList.add('is-hidden'); }, 5000);

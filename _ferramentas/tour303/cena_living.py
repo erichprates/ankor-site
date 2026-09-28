@@ -463,9 +463,6 @@ for y0, y1 in ((SY0, SY0 + 0.2), (SY1 - 0.2, SY1)):
 for i, (y0, y1) in enumerate(((1.15, 1.9), (1.9, 2.65), (2.65, 3.15))):
     box('assento', SX0 + 0.02, SX1 - 0.22, y0 + 0.01, y1 - 0.01, 0.42, 0.52, M['navy'], bevel=0.05)
     box('almofada_encosto', SX1 - 0.4, SX1 - 0.2, y0 + 0.02, y1 - 0.02, 0.52, 0.95, M['navy'], bevel=0.07)
-for y, m_ in ((1.3, M['linen']), (2.2, M['cushion_rust']), (2.9, M['linen'])):
-    o = box('almofada_decor', SX1 - 0.45, SX1 - 0.3, y - 0.22, y + 0.22, 0.55, 0.95, m_, bevel=0.07)
-    o.rotation_euler = (0, math.radians(-12), 0)
 for (x, y) in ((1.85, 0.97), (3.3, 0.97), (1.85, 3.28), (3.3, 3.28)):
     box('pe_sofa', x - 0.02, x + 0.02, y - 0.02, y + 0.02, 0, 0.1, M['black'])
 # aparador atrás do sofá
@@ -494,13 +491,13 @@ def armchair(cx, cy, facing):
 armchair(1.2, 0.8, +1)
 armchair(1.2, 3.65, -1)
 
-# luminária de chão em arco (preta)
-cyl('luminaria_base', 3.75, 3.7, 0.0, 0.04, 0.16, M['black'])
-cyl('luminaria_haste', 3.75, 3.7, 0.04, 1.75, 0.012, M['black'])
-bpy.ops.mesh.primitive_cone_add(vertices=48, radius1=0.24, radius2=0.12, depth=0.3, location=(3.4, -3.35, 1.62))
-shade = bpy.context.active_object; shade.data.materials.append(M['black']); bpy.ops.object.shade_smooth()
-shade.rotation_euler = (math.radians(180), 0, 0)
-box('luminaria_braco', 3.4, 3.75, 3.35, 3.7, 1.74, 1.76, M['black'])
+# luminária de chão preta (haste reta + cúpula cônica com a boca para baixo)
+cyl('luminaria_base', 3.72, 3.68, 0.0, 0.03, 0.15, M['black'])
+cyl('luminaria_haste', 3.72, 3.68, 0.03, 1.42, 0.012, M['black'])
+bpy.ops.mesh.primitive_cone_add(vertices=48, radius1=0.22, radius2=0.09, depth=0.3, end_fill_type='NOTHING', location=(3.72, -3.68, 1.52))
+shade = bpy.context.active_object; shade.name = 'luminaria_cupula'
+sol = shade.modifiers.new('espessura', 'SOLIDIFY'); sol.thickness = 0.004
+shade.data.materials.append(M['black']); bpy.ops.object.shade_smooth()
 
 # planta grande no canto (costela-de-adão/ave-do-paraíso)
 def plant(x, y, h=1.6, n=14):
@@ -649,7 +646,7 @@ bpy.ops.object.light_add(type='POINT', location=(TX, -TY, 2.02))
 l = bpy.context.active_object; l.data.energy = 30; l.data.color = (1.0, 0.72, 0.45); l.data.shadow_soft_size = 0.1
 bpy.ops.object.light_add(type='POINT', location=(3.68, -1.25, 1.05))
 l = bpy.context.active_object; l.data.energy = 12; l.data.color = (1.0, 0.72, 0.45)
-bpy.ops.object.light_add(type='POINT', location=(3.4, -3.35, 1.55))
+bpy.ops.object.light_add(type='POINT', location=(3.72, -3.68, 1.45))
 l = bpy.context.active_object; l.data.energy = 15; l.data.color = (1.0, 0.72, 0.45)
 bpy.ops.object.light_add(type='AREA', location=(3.85, -(KY1 - 0.3), 1.47))
 l = bpy.context.active_object; l.data.energy = 30; l.data.size = 3.8; l.data.size_y = 0.08
