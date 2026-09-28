@@ -357,6 +357,8 @@ wall_x(-1.45, 6.13, 9.05, openings=[(6.45, 7.55, 2.2, 0)])
 # corredor escuro atrás da passagem
 box('corredor_piso', -4.0, -1.6, 6.3, 7.7, -0.05, 0, M['floor'])
 box('corredor_fundo', -4.1, -4.0, 6.3, 7.7, 0, H, M['wall'])
+box('corredor_lado1', -4.1, -1.45, 6.2, 6.3, 0, H, M['wall'])
+box('corredor_lado2', -4.1, -1.45, 7.7, 7.8, 0, H, M['wall'])
 box('corredor_teto', -4.0, -1.6, 6.3, 7.7, H - 0.2, H - 0.15, M['plaster_white'])
 box('porta_suite', -3.2, -2.3, 6.25, 6.3, 0, 2.2, M['wood'])
 
@@ -447,7 +449,26 @@ prism('vidro_lateral', [(edge_x(TOP) + 0.09, TOP), (edge_x(TOP) + 0.11, TOP), (e
 prism('corrimao_lateral', [(edge_x(TOP) + 0.08, TOP), (edge_x(TOP) + 0.12, TOP), (edge_x(BOT) + 0.12, BOT), (edge_x(BOT) + 0.08, BOT)], 1.25, 1.28, M['steel'])
 # muro dos fundos (divisa) com painel de pedra, como na foto
 box('muro_fundos', 5.9, edge_x(BOT) + 0.2, BOT, BOT + 0.2, 0, 2.1, M['white'])
-box('painel_pedra', 11.2, 12.0, BOT - 0.02, BOT, 0.2, 2.1, M['stone'])
+# painel de revestimento em pedra no muro (como na foto real) — com textura de pedra, rente à parede
+def stone_build(nt, b):
+    br = nt.nodes.new('ShaderNodeTexBrick')
+    br.inputs['Scale'].default_value = 3.5
+    br.inputs['Color1'].default_value = (*srgb('#9c968c'), 1)
+    br.inputs['Color2'].default_value = (*srgb('#7d786f'), 1)
+    br.inputs['Mortar'].default_value = (*srgb('#6a655d'), 1)
+    br.inputs['Mortar Size'].default_value = 0.01
+    br.inputs['Brick Width'].default_value = 0.6
+    br.inputs['Row Height'].default_value = 0.25
+    nt.links.new(tex_coord(nt), br.inputs['Vector'])
+    nz = nt.nodes.new('ShaderNodeTexNoise'); nz.inputs['Scale'].default_value = 25; nz.inputs['Detail'].default_value = 10
+    nt.links.new(tex_coord(nt), nz.inputs['Vector'])
+    mx = nt.nodes.new('ShaderNodeMix'); mx.data_type = 'RGBA'; mx.blend_type = 'MULTIPLY'; mx.inputs['Factor'].default_value = 0.35
+    nt.links.new(br.outputs['Color'], mx.inputs[6]); nt.links.new(nz.outputs['Color'], mx.inputs[7])
+    nt.links.new(mx.outputs[2], b.inputs['Base Color'])
+    b.inputs['Roughness'].default_value = 0.9
+    bump = nt.nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value = 0.8
+    nt.links.new(nz.outputs['Fac'], bump.inputs['Height']); nt.links.new(bump.outputs['Normal'], b.inputs['Normal'])
+box('painel_pedra', 11.2, 12.0, BOT - 0.01, BOT, 0.0, 2.1, node_mat('pedra_natural', stone_build))
 # jardineira no fim do deck
 box('jardineira', 11.8, edge_x(8.4) - 0.05, 8.4, 8.95, 0, 0.45, M['white'])
 for k in range(16):
@@ -542,9 +563,6 @@ def backdrop(name, path, center, size, rot_z, crop=None, strength=1.0):
 VIEW_BAIA = os.path.join(ORIG, 'WhatsApp-Image-2026-02-09-at-11.46.10-3.jpeg')   # do solarium, olhando para a frente: baía + morro
 VIEW_JARDIM = os.path.join(ORIG, 'WhatsApp-Image-2026-02-09-at-11.46.10.jpeg')   # do solarium, olhando para a lateral: jardins + serra
 # fotos reais em planos distantes (~45 m), horizonte na altura dos olhos
-backdrop('vista_frente', VIEW_BAIA, (9.0, 45.0, 1.0), (100, 70.3), 180, crop=(0.2, 0.0, 1.0, 1.0), strength=1.15)
-backdrop('vista_lateral', VIEW_JARDIM, (55.0, -3.0, 1.0), (110, 68.8), 90, crop=(0.08, 0.0, 1.0, 1.0), strength=1.15)
-backdrop('vista_fundos', VIEW_JARDIM, (9.0, -55.0, 1.0), (110, 68.8), 0, crop=(0.0, 0.0, 0.85, 1.0), strength=1.0)
 
 # ================================================================== LIVING
 # parede da TV: ripado de madeira em toda a parede esquerda do living
@@ -729,8 +747,14 @@ sun.rotation_euler = (math.radians(55), 0, math.radians(80))   # sol de fim de t
 world = bpy.data.worlds.new('ceu'); scene.world = world
 world.use_nodes = True
 bg = world.node_tree.nodes['Background']
+# paisagem 360° (vista do terraço da 303) como mundo: centro da imagem = +x da planta (serra/cidade)
+PAISAGEM = os.path.join(ORIG, 'vista303', 'paisagem_360.png')
+if os.path.exists(PAISAGEM):
+    env = world.node_tree.nodes.new('ShaderNodeTexEnvironment')
+    env.image = bpy.data.images.load(PAISAGEM)
+    world.node_tree.links.new(env.outputs['Color'], bg.inputs['Color'])
 bg.inputs['Color'].default_value = (*srgb('#6fa3dc'), 1)
-bg.inputs['Strength'].default_value = 2.2
+bg.inputs['Strength'].default_value = 1.6
 
 # portais de luz nas esquadrias
 def portal(loc, size, rot):
