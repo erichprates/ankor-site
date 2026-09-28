@@ -125,10 +125,11 @@
     };
   });
   var viewer = pannellum.viewer('pano', {
-    default: { firstScene: 'terraco', sceneFadeDuration: 900, autoLoad: true, showControls: true, compass: false, minHfov: 50, maxHfov: 115, mouseZoom: true, keyboardZoom: true },
+    default: { firstScene: 'terraco', sceneFadeDuration: 900, autoRotate: -2, autoRotateInactivityDelay: 8000, autoLoad: true, showControls: true, compass: false, minHfov: 50, maxHfov: 115, mouseZoom: true, keyboardZoom: true },
     scenes: scenes
   });
 
+  window.tourViewer = viewer;
   var rooms = document.getElementById('rooms'), map = document.getElementById('map');
   ROOMS.forEach(function (r) {
     var b = document.createElement('button'); b.type = 'button'; b.textContent = r.label; b.dataset.id = r.id;
