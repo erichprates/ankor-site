@@ -207,3 +207,23 @@ em qualquer pasta (por exemplo, `construtoraconvenio.com.br/ankor/`).
 - 304: legenda "Vista a partir da suíte" na última foto de vista para o mar.
 - LPs: localização igual à da home; vídeo institucional antes dela; formulário por último.
 - Endereço: Av. Leovigildo Dias Vieira, 1724, Itaguá, Ubatuba, SP.
+
+---
+
+## 8. Piloto: Tour 360° Cobertura 303 (em aprovação com o cliente, 28/09/2026)
+
+Pasta `tour-303/` (não linkada no site). Ambientes prontos: **Terraço**, **Living e jantar**, **Cozinha**.
+
+**Como é feito (fluxo aprovado):**
+1. Modelo 3D no Blender (`_ferramentas/tour303/cena_living.py`) seguindo a **planta humanizada**, com medidas do DWG
+   (`17-268-REM-ITAUB_EST.18_R00_V21.dwg`): esquadrias 2,60 m de altura, porta living/terraço 3,60 m, cobertura ~3,9 m, pé-direito 2,80 m.
+2. Paisagem 360° (`_originais/vista303/paisagem_360.png`) gerada por IA a partir das fotos reais do terraço,
+   usada como "mundo" do 3D (centro da imagem = saída do living para o terraço: serra e cidade; esquerda = parque e morro).
+   `vista_pano.py` posiciona as fotos por direção (guia para a IA). **Trocar por foto 360° real quando houver.**
+3. Render equirretangular "sem acabamento" no Blender (~2 min por ambiente):
+   `Blender -b -P cena_living.py -- --out render/vX --samples 48 --res 2688 --only terraco_360,living_360,cozinha_360`
+4. Refinamento "IA única" na Higgsfield (GPT Image 2.5, 21:9, qualidade alta, ~2,75 créditos/ambiente),
+   usando a versão refinada anterior como referência de estilo.
+5. Exportar em WebP 4096×2048 para `tour-303/img/<ambiente>.webp`. Visualizador: Pannellum (CDN); no celular roda só na horizontal.
+
+**Pendências:** deck com jacuzzi, 3 suítes e banheiros; foto 360° real do terraço; decidir sobre o painel de pedra do muro.
