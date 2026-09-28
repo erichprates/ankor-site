@@ -226,4 +226,13 @@ Pasta `tour-303/` (não linkada no site). Ambientes prontos: **Terraço**, **Liv
    usando a versão refinada anterior como referência de estilo.
 5. Exportar em WebP 4096×2048 para `tour-303/img/<ambiente>.webp`. Visualizador: Pannellum (CDN); no celular roda só na horizontal.
 
-**Pendências:** deck com jacuzzi, 3 suítes e banheiros; foto 360° real do terraço; decidir sobre o painel de pedra do muro.
+**Publicado para o cliente:** https://erichprates.github.io/ankor-site/tour-303/ (sem link no site, sem nota de "ilustrativo" a pedido).
+
+**Recursos do visualizador:** começa no Terraço; pré-carrega todos os ambientes em segundo plano (troca ~0,3 s);
+gira sozinho a 2°/s, para quando a pessoa toca/arrasta e volta após 8 s parado; no celular só na horizontal.
+
+**Ajustes manuais:** `tour-303/img/terraco.webp` teve a "porta" do muro removida no Photoshop
+(cópia em `_ferramentas/tour303/render/v4/terraco_final_photoshop.webp`). Ao refazer o terraço, **tirar o
+painel de pedra do modelo** para não voltar.
+
+**Pendências:** retorno do cliente; deck com jacuzzi, 3 suítes e banheiros; foto 360° real do terraço.
