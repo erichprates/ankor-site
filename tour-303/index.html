@@ -144,6 +144,16 @@
   }
   viewer.on('scenechange', sync); viewer.on('load', sync);
 
+  // Pré-carrega os outros ambientes em segundo plano, logo após o primeiro aparecer,
+  // para a troca entre ambientes ser instantânea (imagens ficam no cache do navegador).
+  var preloaded = false;
+  viewer.on('load', function () {
+    if (preloaded) return; preloaded = true;
+    ROOMS.forEach(function (r, i) {
+      setTimeout(function () { var im = new Image(); im.decoding = 'async'; im.src = src(r.id); }, 300 * i);
+    });
+  });
+
   // Em tela cheia no celular, tenta travar na horizontal (Android; no iPhone o aviso de girar cobre o caso)
   document.addEventListener('fullscreenchange', function () {
     if (document.fullscreenElement && screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function () {});
