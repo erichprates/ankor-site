@@ -204,8 +204,9 @@ def page(u, d):
   <div class="container">
     <div class="section-head reveal">
       <p class="eyebrow">Vista para o mar e implantação</p>
-      <h2 class="h2">Uma vista para <em>contemplar Ubatuba</em></h2>
-      <p class="lead">Localizada na parte posterior do edifício, a cobertura possui vista para o mar pelas laterais da unidade. A implantação e as imagens reais permitem conhecer a orientação da cobertura e a relação dos ambientes com a paisagem.</p>
+      <h2 class="h2">Uma perspectiva <em>singular de Ubatuba</em></h2>
+      <p class="lead">A localização da cobertura na parte posterior do edifício proporciona uma perspectiva própria e surpreendente da paisagem de Ubatuba. A vista se abre para o mar e para as montanhas, pelas laterais do apartamento, criando um cenário amplo e privilegiado.</p>
+      <p class="lead">A implantação do edifício e as imagens reais da cobertura permitem visualizar sua orientação e comprovar a amplitude dessa vista.</p>
     </div>
     <div class="view">
       <div class="implant reveal">
