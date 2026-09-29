@@ -46,10 +46,10 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .container { width: 100%; max-width: calc(var(--max) + var(--gutter) * 2); margin: 0 auto; padding: 0 var(--gutter); }
-.section { padding: clamp(72px, 10vw, 128px) 0; }
+.section { padding: clamp(48px, 10vw, 128px) 0; }
 .section--sand { background: var(--sand); }
 .section--dark { background: var(--ink); color: var(--peach); }
-.section--tight { padding: clamp(48px, 7vw, 80px) 0; }
+.section--tight { padding: clamp(36px, 7vw, 80px) 0; }
 
 /* ---------- Tipografia ---------- */
 .eyebrow {
@@ -72,7 +72,7 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 
 .lead { font-size: clamp(17px, 1.4vw, 19px); color: var(--muted); max-width: 60ch; }
 .section--dark .lead { color: rgba(255, 229, 212, .78); }
-.section-head { max-width: 760px; margin-bottom: clamp(40px, 5vw, 64px); }
+.section-head { max-width: 760px; margin-bottom: clamp(32px, 5vw, 64px); }
 .section-head .lead { margin-top: 20px; }
 .section-head--center { margin-left: auto; margin-right: auto; text-align: center; }
 .section-head--center .eyebrow::after { content: ""; width: 28px; height: 1px; background: currentColor; }
