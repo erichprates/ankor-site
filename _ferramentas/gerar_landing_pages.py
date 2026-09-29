@@ -27,7 +27,7 @@ UNITS = {
     title_plain='Uma cobertura única, pensada para quem valoriza espaço, conforto e sofisticação.',
     sub='Ambientes amplos, varanda gourmet e solarium com vista para o mar, em uma localização privilegiada no Itaguá.',
     hero='hero/lp-303.webp', hero_wh=(1600, 1280), hero_pos='50% 50%', hero_zoom=1, hero_note='Foto real · varanda gourmet', hero_alt='Varanda gourmet coberta da Cobertura 303, com forro de madeira e vista para as montanhas',
-    intro='vista/303-vista-janela.webp', intro_alt='Living da Cobertura {u} com varanda e vista para o mar', view='vista/303-vista-mar.webp',
+    intro='vista/303-vista-solarium.webp', intro_alt='Solarium da Cobertura {u} com vista para o mar', view='vista/303-vista-mar.webp',
     plan='plantas/planta-303.webp', other='304', other_img='vista/304-vista-solarium-sm.webp',
     other_area='254', other_price='R$ 4.280.000,00', pos='y303'),
   '304': dict(area='254', price='R$ 4.280.000,00', price_short='R$ 4.280.000',
