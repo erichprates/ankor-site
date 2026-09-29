@@ -171,7 +171,10 @@ Abra http://localhost:8765 (use Cmd+Shift+R para limpar o cache depois de mudan�
 
 **Site no ar:** https://construtoraconvenio.com.br/ankor/ (HostGator, pasta `public_html/ankor`,
 desde 29/09/2026). O WordPress antigo do /ankor foi renomeado para `public_html/ankor_antigo`.
-A prévia do GitHub Pages foi desativada; o GitHub (`erichprates/ankor-site`) é só o histórico.
+O GitHub Pages publica só o **tour 360°** (ramo `gh-pages`, que tem apenas `tour-303/`, a planta,
+o logo e o favicon): https://erichprates.github.io/ankor-site/tour-303/ . A raiz da prévia
+redireciona para o site oficial. Para atualizar o tour lá, copie os arquivos para o ramo `gh-pages`
+(por exemplo com `git worktree add ../ghp gh-pages`), faça commit e push. O ramo `main` é o histórico do site.
 
 **Publicar uma atualização:**
 1. `sh _ferramentas/empacotar.sh` (gera as LPs e cria `_deploy/ankor.zip`, sem tour, ferramentas e originais).
