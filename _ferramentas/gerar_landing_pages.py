@@ -222,8 +222,7 @@ def page(u, d):
           <button class="g-item" data-img="{d['view'].split('/')[1][:-5]}" style="border-radius:0"><img src="../assets/img/{d['view']}" alt="Vista lateral para o mar a partir da Cobertura {u}" loading="lazy" width="1280" height="720"></button>
           <span class="tag">Foto real da vista</span>
         </figure>
-        <p class="view__caption">A unidade está localizada na parte posterior do prédio e possui vista lateral para o mar.</p>
-        <a href="#agendar" class="btn btn--peach" data-goal="Conhecer a vista da cobertura">Quero conhecer a vista da cobertura {ARROW}</a>
+        <a href="#agendar" class="btn btn--peach" style="margin-top:24px" data-goal="Conhecer a vista da cobertura">Quero conhecer a vista da cobertura {ARROW}</a>
       </div>
     </div>
   </div>
