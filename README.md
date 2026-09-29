@@ -237,6 +237,24 @@ obrigadocorretor, outroimovel, corretores) e manda endereços inexistentes para 
 - Espaçamento entre seções menor no celular.
 - Topo das LPs em duas colunas (texto + foto em box), para mostrar mar e montanhas em vez de céu.
 - Preços em Manrope (números retos), no lugar da Cormorant.
+- Site publicado em construtoraconvenio.com.br/ankor (HostGator), no lugar do WordPress do /ankor
+  (guardado em `public_html/ankor_antigo`). GitHub Pages ficou só com o tour 360°.
+- Formulário: embed do respondi.app (JDCmWvqf) na home e nas LPs, com as UTMs repassadas.
+  Ele redireciona para `obrigado/` (coberturas, conversão do Ads + Lead do Pixel) ou
+  `obrigado-contato/` (outros empreendimentos e corretores).
+- Contato: texto ocupa a altura do formulário, com três pontos de atendimento embaixo
+  (no celular os pontos vão depois do formulário).
+- GA4 `G-858ZVEWJJ1` e Google Ads `AW-10869641873` em todas as páginas, como no WordPress antigo.
+- Home: descrição de compartilhamento e subtítulo do topo sem destaque para a Marina
+  ("na melhor localização do Itaguá").
+- Fotos profissionais das coberturas (Confector, 03/2026; originais em `_originais/confector/`)
+  no lugar das fotos de celular dos mesmos ambientes. Ficaram as antigas que mostram a vista.
+- 303: topo com a varanda gourmet (foto profissional); seção "A cobertura" com a vista do solarium.
+- 304: topo com a vista lateral para o mar; seção "A cobertura" com solarium e varanda gourmet;
+  seção de vista com a vista a partir do solarium.
+- Cache da HostGator: o `.htaccess` impede o proxy de guardar o HTML (cabeçalho `X-Accel-Expires: 0`).
+
+**Próximo passo:** continuar o tour 360° da 303 (seção 8).
 
 ---
 
