@@ -18,7 +18,8 @@ ROOT = os.environ.get('ANKOR_ROOT') or os.path.dirname(os.path.dirname(os.path.a
 GTAG = """<script async src="https://www.googletagmanager.com/gtag/js?id=G-858ZVEWJJ1"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858ZVEWJJ1');gtag('config','AW-10869641873');</script>"""
 CONVERSAO_ADS = "<script>gtag('event','conversion',{'send_to':'AW-10869641873/pZuNCIeHxeAYEJGlhr8o'});</script>"
-V = '20260929d'  # versão do CSS/JS (troque ao mudar style.css ou um JS; na home também)
+V = '20260929d'
+SITE = 'https://construtoraconvenio.com.br/ankor/'  # endereço oficial (canonical e imagens de compartilhamento)  # versão do CSS/JS (troque ao mudar style.css ou um JS; na home também)
 
 UNITS = {
   '303': dict(area='240', price='R$ 3.980.000,00', price_short='R$ 3.980.000',
@@ -104,7 +105,10 @@ def page(u, d):
 <link rel="icon" href="../assets/brand/favicon.png">
 <meta property="og:title" content="Cobertura {u} · Ankor Exclusive Residence">
 <meta property="og:description" content="{d['title_plain']}">
-<meta property="og:image" content="../assets/img/{d['hero']}">
+<meta property="og:image" content="{SITE}assets/img/og/og-{u}.jpg">
+<meta property="og:url" content="{SITE}cobertura-{u}/">
+<meta property="og:type" content="website">
+<link rel="canonical" href="{SITE}cobertura-{u}/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">

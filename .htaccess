@@ -1,0 +1,32 @@
+# Site estático do Ankor em construtoraconvenio.com.br/ankor/
+DirectoryIndex index.html
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /ankor/
+
+# Endereços do WordPress antigo
+RewriteRule ^cobertura303/?$ /ankor/cobertura-303/ [R=301,L]
+RewriteRule ^cobertura304/?$ /ankor/cobertura-304/ [R=301,L]
+RewriteRule ^(obrigadocorretor|outroimovel)/?$ /ankor/obrigado-contato/ [R=301,L]
+RewriteRule ^corretores/?$ /ankor/#contato [R=301,NE,L]
+
+# Qualquer outro endereço que não exista volta para a home
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ /ankor/ [R=302,L]
+</IfModule>
+
+# Cache: CSS/JS têm versão no endereço (?v=), imagens mudam pouco, HTML sempre atualizado
+<IfModule mod_expires.c>
+ExpiresActive On
+ExpiresByType text/html "access plus 0 seconds"
+ExpiresByType text/css "access plus 1 year"
+ExpiresByType application/javascript "access plus 1 year"
+ExpiresByType text/javascript "access plus 1 year"
+ExpiresByType image/webp "access plus 30 days"
+ExpiresByType image/jpeg "access plus 30 days"
+ExpiresByType image/png "access plus 30 days"
+ExpiresByType image/svg+xml "access plus 30 days"
+</IfModule>
