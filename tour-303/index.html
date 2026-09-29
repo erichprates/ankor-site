@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tour 360° · Cobertura 303 · Ankor</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#2e2f2a">
+<link rel="icon" href="../assets/brand/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css">
+<style>
+  :root { --ink:#2e2f2a; --ink-deep:#1f201c; --peach:#ffe5d4; --copper:#ac6620; --copper-light:#c9823b; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--ink-deep); color: var(--peach); font-family: "Manrope", system-ui, sans-serif; overflow: hidden; }
+  #pano { position: fixed; inset: 0; }
+  .top { position: fixed; top: 0; left: 0; right: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+         padding: 16px clamp(16px, 3vw, 32px); background: linear-gradient(180deg, rgba(20,20,18,.75), rgba(20,20,18,0)); pointer-events: none; }
+  .top > * { pointer-events: auto; }
+  .brand { display: flex; align-items: center; gap: 16px; }
+  .brand img { width: 150px; }
+  .brand a { color: rgba(255,229,212,.75); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; text-decoration: none; }
+  .title { text-align: right; }
+  .title small { display: block; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--copper-light); }
+  .title strong { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: clamp(22px, 2.4vw, 30px); }
+  .panel { position: fixed; left: clamp(12px, 2vw, 24px); bottom: clamp(12px, 2vw, 24px); z-index: 5; width: min(340px, calc(100vw - 24px));
+           background: rgba(31,32,28,.86); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+           border: 1px solid rgba(255,229,212,.14); border-radius: 20px; padding: 14px; }
+  .rooms { display: flex; gap: 8px; margin-bottom: 12px; }
+  .rooms button { flex: 1; white-space: nowrap; font: inherit; font-size: 13px; font-weight: 600; padding: 10px 12px; border-radius: 999px; cursor: pointer;
+                  border: 1px solid rgba(255,229,212,.25); background: transparent; color: var(--peach); transition: .2s; }
+  .rooms button[aria-pressed="true"] { background: var(--peach); color: var(--ink); border-color: var(--peach); }
+  .map { position: relative; border-radius: 12px; overflow: hidden; background: #fff; }
+  .map img { display: block; width: 100%; }
+  .map .pt { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; cursor: pointer; border: 0; padding: 0;
+             background: var(--copper); box-shadow: 0 0 0 3px #fff, 0 2px 8px rgba(0,0,0,.35); }
+  .map .pt.is-active { background: var(--ink); }
+  .map .pt.is-active::after { content: ""; position: absolute; inset: -8px; border-radius: 50%; border: 2px solid var(--copper); animation: ping 1.8s infinite; }
+  @keyframes ping { from { transform: scale(.6); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+  .mode { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; font-size: 12.5px; color: rgba(255,229,212,.75); }
+  .mode[hidden] { display: none; }
+  .switch { display: inline-flex; border: 1px solid rgba(255,229,212,.25); border-radius: 999px; overflow: hidden; }
+  .switch button { font: inherit; font-size: 12px; font-weight: 600; padding: 7px 12px; border: 0; background: transparent; color: var(--peach); cursor: pointer; }
+  .switch button[aria-pressed="true"] { background: var(--copper); color: #fff; }
+  .note { position: fixed; right: clamp(12px, 2vw, 24px); bottom: clamp(12px, 2vw, 24px); z-index: 5; max-width: 300px; font-size: 11.5px; line-height: 1.5;
+          color: rgba(255,229,212,.7); background: rgba(31,32,28,.7); padding: 10px 14px; border-radius: 12px; }
+  .hint { position: fixed; left: 50%; top: 50%; z-index: 6; transform: translate(-50%, -50%); pointer-events: none; text-align: center;
+          background: rgba(31,32,28,.72); padding: 14px 20px; border-radius: 14px; font-size: 14px; transition: opacity .6s; }
+  .hint.is-hidden { opacity: 0; }
+  /* hotspots */
+  .hs-go { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,229,212,.9); box-shadow: 0 6px 20px rgba(0,0,0,.35); cursor: pointer; }
+  .hs-go::before { content: ""; position: absolute; inset: -8px; border-radius: 50%; border: 2px solid rgba(255,229,212,.7); animation: ping 2s infinite; }
+  .hs-go::after { content: ""; position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -10px 0 0 -7px; border-left: 3px solid var(--copper); border-top: 3px solid var(--copper); transform: rotate(45deg); }
+  .hs-go span { position: absolute; top: 64px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 13px; font-weight: 600;
+                background: rgba(31,32,28,.85); color: var(--peach); padding: 6px 12px; border-radius: 999px; }
+  .pnlm-load-box { background: rgba(31,32,28,.9); border-radius: 14px; }
+  .pnlm-controls-container { top: 90px; }
+  .pnlm-panorama-info { display: none !important; }
+  /* Celular: o tour roda só na horizontal */
+  .rotate { position: fixed; inset: 0; z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+            background: var(--ink-deep); color: var(--peach); text-align: center; padding: 24px; }
+  .rotate svg { width: 72px; height: 72px; color: var(--copper-light); animation: turn 2.4s ease-in-out infinite; }
+  .rotate strong { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 30px; }
+  .rotate span { font-size: 14px; color: rgba(255,229,212,.7); }
+  @keyframes turn { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
+  @media (orientation: portrait) and (pointer: coarse) and (max-width: 900px) { .rotate { display: flex; } }
+  /* celular deitado: interface compacta */
+  @media (max-height: 520px) {
+    .top { padding: 10px 16px; }
+    .brand img { width: 104px; } .brand a { display: none; }
+    .title small { font-size: 9px; } .title strong { font-size: 20px; }
+    .note, .map { display: none; }
+    .panel { width: auto; padding: 8px; left: 12px; bottom: 12px; }
+    .rooms { margin: 0; }
+    .rooms button { padding: 8px 14px; font-size: 12px; white-space: nowrap; }
+    .pnlm-controls-container { top: 64px; }
+    .hint { font-size: 13px; }
+  }
+</style>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N2VF7FVX');</script>
+<!-- Google Analytics 4 e Google Ads (as mesmas tags do WordPress antigo do /ankor, fora do GTM) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-858ZVEWJJ1"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858ZVEWJJ1');gtag('config','AW-10869641873');</script>
+<!-- Meta Pixel -->
+<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','279593157240250');fbq('track','PageView');</script>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N2VF7FVX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<div id="pano"></div>
+
+<header class="top">
+  <div class="brand">
+    <img src="../assets/brand/ankor-logo.png" alt="Ankor Exclusive Residence">
+    <a href="https://construtoraconvenio.com.br/ankor/cobertura-303/">← Cobertura 303</a>
+  </div>
+  <div class="title"><small>Tour virtual 360°</small><strong>Cobertura 303</strong></div>
+</header>
+
+<aside class="panel" aria-label="Ambientes">
+  <div class="rooms" id="rooms"></div>
+  <div class="map" id="map"><img src="../assets/img/plantas/planta-303.webp" alt="Planta da Cobertura 303 com os pontos do tour"></div>
+</aside>
+
+<div class="hint" id="hint">Arraste para olhar em volta</div>
+<div class="rotate" aria-live="polite">
+  <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="8" width="24" height="42" rx="4"/><path d="M29 44h6"/><path d="M50 40a18 18 0 0 1-14 16"/><path d="M40 52l-4 4 4 4" /></svg>
+  <strong>Gire o celular</strong>
+  <span>O tour 360° funciona na horizontal.</span>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js"></script>
+<script>
+(function () {
+  // Pontos do tour. x/y = posição na planta (0–1). yaw/pitch dos hotspots em graus (Pannellum).
+  var ROOMS = [
+    { id: 'terraco', label: 'Terraço', x: 0.725, y: 0.333, yaw: 60, links: [{ to: 'living', label: 'Living', yaw: 1, pitch: -11 }] },
+    { id: 'living', label: 'Living e jantar', x: 0.442, y: 0.326, yaw: 0, links: [{ to: 'cozinha', label: 'Cozinha', yaw: -106, pitch: -19 }, { to: 'terraco', label: 'Terraço', yaw: 179, pitch: -11 }] },
+    { id: 'cozinha', label: 'Cozinha', x: 0.477, y: 0.545, yaw: 20, links: [{ to: 'living', label: 'Living', yaw: 74, pitch: -19 }] }
+  ];
+  function src(id) { return 'img/' + id + '.webp'; }
+
+  var scenes = {};
+  ROOMS.forEach(function (r) {
+    scenes[r.id] = {
+      title: r.label, type: 'equirectangular', panorama: src(r.id), yaw: r.yaw, pitch: -4, hfov: 105,
+      hotSpots: r.links.map(function (l) {
+        return { pitch: l.pitch, yaw: l.yaw, type: 'scene', sceneId: l.to, cssClass: 'hs-go',
+                 createTooltipFunc: function (div) { var s = document.createElement('span'); s.textContent = l.label; div.appendChild(s); } };
+      })
+    };
+  });
+  var viewer = pannellum.viewer('pano', {
+    default: { firstScene: 'terraco', sceneFadeDuration: 900, autoRotate: -2, autoRotateInactivityDelay: 8000, autoLoad: true, showControls: true, compass: false, minHfov: 50, maxHfov: 115, mouseZoom: true, keyboardZoom: true },
+    scenes: scenes
+  });
+
+  window.tourViewer = viewer;
+  var rooms = document.getElementById('rooms'), map = document.getElementById('map');
+  ROOMS.forEach(function (r) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = r.label; b.dataset.id = r.id;
+    b.addEventListener('click', function () { viewer.loadScene(r.id); }); rooms.appendChild(b);
+    var p = document.createElement('button'); p.className = 'pt'; p.type = 'button'; p.dataset.id = r.id;
+    p.style.left = (r.x * 100) + '%'; p.style.top = (r.y * 100) + '%'; p.setAttribute('aria-label', r.label);
+    p.addEventListener('click', function () { viewer.loadScene(r.id); }); map.appendChild(p);
+  });
+  function sync() {
+    var id = viewer.getScene();
+    rooms.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.id === id); });
+    map.querySelectorAll('.pt').forEach(function (p) { p.classList.toggle('is-active', p.dataset.id === id); });
+  }
+  viewer.on('scenechange', sync); viewer.on('load', sync);
+
+  // Pré-carrega os outros ambientes em segundo plano, logo após o primeiro aparecer,
+  // para a troca entre ambientes ser instantânea (imagens ficam no cache do navegador).
+  var preloaded = false;
+  viewer.on('load', function () {
+    if (preloaded) return; preloaded = true;
+    ROOMS.forEach(function (r, i) {
+      setTimeout(function () { var im = new Image(); im.decoding = 'async'; im.src = src(r.id); }, 300 * i);
+    });
+  });
+
+  // Em tela cheia no celular, tenta travar na horizontal (Android; no iPhone o aviso de girar cobre o caso)
+  document.addEventListener('fullscreenchange', function () {
+    if (document.fullscreenElement && screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function () {});
+  });
+  var hint = document.getElementById('hint');
+  ['mousedown', 'touchstart', 'keydown'].forEach(function (ev) { document.addEventListener(ev, function () { hint.classList.add('is-hidden'); }, { once: true }); });
+  setTimeout(function () { hint.classList.add('is-hidden'); }, 5000);
+})();
+</script>
+</body>
+</html>
