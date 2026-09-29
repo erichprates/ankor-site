@@ -49,8 +49,8 @@ _originais/                    Fotos em tamanho original (~104 MB). Fora deste r
    números e 3 fotos. A foto grande é a fachada frontal com o totem "K".
 3. **Coberturas 303 e 304**: selo pulsante "Últimas unidades · direto com a construtora",
    a palavra "disponíveis" pulsando de leve e dois cards (área, preço, atributos,
-   mini-implantação e botão para a LP). **Abaixo dos cards** fica o aviso de que as unidades
-   estão na parte posterior do edifício, com vista para o mar pelas laterais.
+   mini-implantação e botão para a LP). Os cards falam em "vista para o mar e para as
+   montanhas pelas laterais"; a palavra "posterior" não aparece na home (pedido de 29/09).
 4. **Vídeo institucional**: capa grande (foto da fachada) com play (YouTube `Oy8C2-HSCjQ`).
 5. **Diferenciais**: 5 blocos (Lazer completo, Convivência, Praticidade, Padrão construtivo,
    Exclusividade residencial).
@@ -72,8 +72,9 @@ No celular, uma barra fixa na parte de baixo mostra "Coberturas" e "Agendar visi
 
 Textos conforme os PDFs das LPs.
 
-1. **Topo**: foto real da unidade, título, subtítulo e faixa com preço, atributos e botão
-   "Agendar uma apresentação privativa".
+1. **Topo**: texto à esquerda e foto real num box arredondado à direita (no celular a foto
+   vem primeiro), com faixa de preço, atributos e botão "Agendar uma apresentação privativa"
+   embaixo. O recorte da foto é ajustado por `hero_pos` e `hero_zoom` no dicionário `UNITS`.
    - 303: `_originais/hero-cobertura-303.png` (terraço com a pilastra branca e a baía)
    - 304: `_originais/hero-cobertura-304.png` (solarium com a baía e a serra)
 2. **A cobertura**: texto e foto (303: living com acesso ao solarium; 304: living integrado à cozinha).
@@ -207,6 +208,15 @@ em qualquer pasta (por exemplo, `construtoraconvenio.com.br/ankor/`).
 - 304: legenda "Vista a partir da suíte" na última foto de vista para o mar.
 - LPs: localização igual à da home; vídeo institucional antes dela; formulário por último.
 - Endereço: Av. Leovigildo Dias Vieira, 1724, Itaguá, Ubatuba, SP.
+
+### Ajustes de 29/09/2026
+
+- Menos ênfase em "posterior": seção de vista das LPs com o texto "Uma perspectiva singular
+  de Ubatuba", sem a legenda repetida sob a foto; home sem a nota abaixo dos cards e com os
+  cards falando só da vista. O FAQ das LPs mantém a explicação (decisão do cliente).
+- Espaçamento entre seções menor no celular.
+- Topo das LPs em duas colunas (texto + foto em box), para mostrar mar e montanhas em vez de céu.
+- Preços em Manrope (números retos), no lugar da Cormorant.
 
 ---
 
