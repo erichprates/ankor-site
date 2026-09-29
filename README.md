@@ -147,9 +147,17 @@ pelo cliente estão no fim do arquivo, em "Ajustes de finalização".
 
 Fontes: **Cormorant Garamond** (títulos) e **Manrope** (textos e preços), via Google Fonts.
 
-**Cache:** o CSS e os JS são chamados com `?v=AAAAMMDD…` (em `index.html` e no
-`gerar_landing_pages.py`). Ao mudar `style.css` ou um JS, troque esse número nos dois lugares
-(e gere as LPs), senão celulares podem continuar mostrando a versão antiga.
+**Cache:** o CSS e os JS são chamados com `?v=AAAAMMDD…`. Ao mudar `style.css` ou um JS, troque
+esse número em `index.html` e na constante `V` do `gerar_landing_pages.py` (e gere as páginas),
+senão celulares podem continuar mostrando a versão antiga.
+
+**Rastreamento (todas as páginas):** GTM `GTM-N2VF7FVX`, GA4 `G-858ZVEWJJ1` e Google Ads
+`AW-10869641873` (as duas últimas direto, como no WordPress antigo) e Meta Pixel `279593157240250`.
+
+**Páginas de obrigado** (geradas pelo `gerar_landing_pages.py`, dicionário `THANKS`, com `noindex`):
+- `obrigado/`: leads das coberturas 303/304. Dispara a conversão do Google Ads e o `Lead` do Pixel.
+- `obrigado-contato/`: outros empreendimentos e corretores. Sem conversão.
+O formulário (embed do respondi.app, a configurar) deve redirecionar para uma ou outra.
 
 ---
 

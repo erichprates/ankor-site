@@ -671,3 +671,8 @@ body.lock { overflow: hidden; }
   .map--wide .map__pin { display: none; }
   .map__addr { display: block; margin: 14px 4px 0; font-size: 14px; color: var(--muted); }
 }
+
+/* ---------- Páginas de obrigado ---------- */
+.thanks { display: flex; align-items: center; min-height: 100svh; }
+.thanks__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(28px, 4vw, 40px); }
+.footer--slim { padding-bottom: 48px; }

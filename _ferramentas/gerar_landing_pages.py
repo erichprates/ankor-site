@@ -1,5 +1,6 @@
 """
-Gera cobertura-303/index.html e cobertura-304/index.html a partir de um único modelo.
+Gera cobertura-303/index.html e cobertura-304/index.html a partir de um único modelo,
+e as páginas de obrigado (obrigado/ e obrigado-contato/).
 
 Uso (na pasta do site):  python3 _ferramentas/gerar_landing_pages.py
 
@@ -11,6 +12,13 @@ Uso (na pasta do site):  python3 _ferramentas/gerar_landing_pages.py
 """
 import os
 ROOT = os.environ.get('ANKOR_ROOT') or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Google Analytics 4 e Google Ads, as mesmas tags do WordPress antigo do /ankor
+# (ficam fora do GTM). A conversão do Ads é disparada só em /obrigado/.
+GTAG = """<script async src="https://www.googletagmanager.com/gtag/js?id=G-858ZVEWJJ1"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858ZVEWJJ1');gtag('config','AW-10869641873');</script>"""
+CONVERSAO_ADS = "<script>gtag('event','conversion',{'send_to':'AW-10869641873/pZuNCIeHxeAYEJGlhr8o'});</script>"
+V = '20260929c'  # versão do CSS/JS (troque ao mudar style.css ou um JS; na home também)
 
 UNITS = {
   '303': dict(area='240', price='R$ 3.980.000,00', price_short='R$ 3.980.000',
@@ -93,7 +101,7 @@ def page(u, d):
 <title>Cobertura {u} · {d['area']} m² · Ankor Exclusive Residence</title>
 <meta name="description" content="Cobertura {u} no Ankor Exclusive Residence, Itaguá, Ubatuba: {d['area']} m² privativos, 3 suítes, varanda gourmet, solarium com infraestrutura para jacuzzi, 2 vagas e armário náutico. {d['price']}.">
 <meta name="theme-color" content="#2e2f2a">
-<link rel="icon" href="https://construtoraconvenio.com.br/ankor/wp-content/uploads/2023/07/favicon-75x75.png">
+<link rel="icon" href="../assets/brand/favicon.png">
 <meta property="og:title" content="Cobertura {u} · Ankor Exclusive Residence">
 <meta property="og:description" content="{d['title_plain']}">
 <meta property="og:image" content="../assets/img/{d['hero']}">
@@ -101,8 +109,9 @@ def page(u, d):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="../assets/img/{d['hero']}" fetchpriority="high">
-<link rel="stylesheet" href="../assets/css/style.css?v=20260929b">
+<link rel="stylesheet" href="../assets/css/style.css?v={V}">
 <script>(function(w,d,s,l,i){{w[l]=w[l]||[];w[l].push({{'gtm.start':new Date().getTime(),event:'gtm.js'}});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);}})(window,document,'script','dataLayer','GTM-N2VF7FVX');</script>
+{GTAG}
 <script>!function(f,b,e,v,n,t,s){{if(f.fbq)return;n=f.fbq=function(){{n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)}};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','279593157240250');fbq('track','PageView');fbq('track','ViewContent',{{content_name:'Cobertura {u}'}});</script>
 </head>
 <body>
@@ -375,9 +384,90 @@ def page(u, d):
   <a href="#" class="btn btn--primary" data-whatsapp="Olá! Tenho interesse na Cobertura {u} do Ankor." hidden>WhatsApp</a>
 </div>
 
-<script src="../assets/js/config.js?v=20260929b"></script>
-<script src="../assets/js/data.js?v=20260929b"></script>
-<script src="../assets/js/main.js?v=20260929b"></script>
+<script src="../assets/js/config.js?v={V}"></script>
+<script src="../assets/js/data.js?v={V}"></script>
+<script src="../assets/js/main.js?v={V}"></script>
+</body>
+</html>
+'''
+
+
+# Páginas de obrigado (destino do formulário depois do envio).
+#   obrigado/          leads das coberturas: dispara a conversão do Google Ads e o Lead do Meta
+#   obrigado-contato/  outros empreendimentos e corretores: sem conversão
+THANKS = {
+  'obrigado': dict(
+    title='Obrigado · Ankor Exclusive Residence', eyebrow='Formulário recebido',
+    h1='Obrigado pelo <em>seu interesse</em>.',
+    text='Em breve um de nossos consultores entrará em contato para agendar a sua apresentação privativa da cobertura.',
+    extra=CONVERSAO_ADS, pixel="fbq('track','Lead');",
+    links=[('../', 'Voltar ao site do Ankor', 'btn--peach'), ('../#coberturas', 'Ver as coberturas', 'btn--ghost-light')]),
+  'obrigado-contato': dict(
+    title='Contato recebido · Ankor Exclusive Residence', eyebrow='Formulário recebido',
+    h1='Agradecemos o <em>seu contato</em>.',
+    text='Em breve a equipe da Construtora Convênio entrará em contato com você.',
+    extra='', pixel='',
+    links=[('../', 'Voltar ao site do Ankor', 'btn--peach'), ('https://construtoraconvenio.com.br', 'Conhecer a Construtora Convênio', 'btn--ghost-light')]),
+}
+
+def thanks_page(d):
+    links = '\n        '.join(
+        f'<a href="{href}" class="btn {cls}"{" target=\"_blank\" rel=\"noopener\"" if href.startswith("http") else ""}>{label}</a>'
+        for href, label, cls in d['links'])
+    return f'''<!doctype html>
+<html lang="pt-BR" data-base="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{d['title']}</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#2e2f2a">
+<link rel="icon" href="../assets/brand/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css?v={V}">
+<script>(function(w,d,s,l,i){{w[l]=w[l]||[];w[l].push({{'gtm.start':new Date().getTime(),event:'gtm.js'}});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);}})(window,document,'script','dataLayer','GTM-N2VF7FVX');</script>
+{GTAG}
+{d['extra']}
+<script>!function(f,b,e,v,n,t,s){{if(f.fbq)return;n=f.fbq=function(){{n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)}};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','279593157240250');fbq('track','PageView');{d['pixel']}</script>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N2VF7FVX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<header class="header">
+  <div class="container header__inner">
+    <a href="../" class="logo logo--lg" aria-label="Voltar ao site do Ankor"><img src="../assets/brand/ankor-logo.png" alt="Ankor Exclusive Residence" width="310" height="58"></a>
+  </div>
+</header>
+
+<main class="lp-hero thanks">
+  <div class="container lp-hero__content">
+    <div class="lp-hero__grid">
+      <div class="lp-hero__text">
+        <p class="eyebrow">{d['eyebrow']}</p>
+        <h1 class="h1">{d['h1']}</h1>
+        <p class="lp-hero__sub">{d['text']}</p>
+        <div class="thanks__actions">
+        {links}
+        </div>
+      </div>
+      <figure class="lp-hero__photo" style="--pos:50% 60%">
+        <img src="../assets/img/hero/hero-1.webp" alt="Fachada do Ankor Exclusive Residence, no Itaguá, em Ubatuba" width="1184" height="864">
+      </figure>
+    </div>
+  </div>
+</main>
+
+<footer class="footer footer--slim">
+  <div class="container">
+    <div class="footer__top">
+      <a href="../" class="logo" aria-label="Ankor Exclusive Residence"><img src="../assets/brand/ankor-logo.png" alt="Ankor Exclusive Residence" width="310" height="58" loading="lazy"></a>
+      <a class="footer__by" href="https://construtoraconvenio.com.br" target="_blank" rel="noopener"><img src="../assets/brand/convenio.svg" alt="" width="44" height="38" loading="lazy">Construtora Convênio</a>
+    </div>
+    <p class="footer__addr">Av. Leovigildo Dias Vieira, 1724 · Itaguá · Ubatuba — SP</p>
+  </div>
+</footer>
 </body>
 </html>
 '''
@@ -386,4 +476,8 @@ for u, d in UNITS.items():
     os.makedirs(f'{ROOT}/cobertura-{u}', exist_ok=True)
     with open(f'{ROOT}/cobertura-{u}/index.html', 'w') as f:
         f.write(page(u, d))
+for slug, d in THANKS.items():
+    os.makedirs(f'{ROOT}/{slug}', exist_ok=True)
+    with open(f'{ROOT}/{slug}/index.html', 'w') as f:
+        f.write(thanks_page(d))
 print('ok')
