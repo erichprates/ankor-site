@@ -30,3 +30,11 @@ ExpiresByType image/jpeg "access plus 30 days"
 ExpiresByType image/png "access plus 30 days"
 ExpiresByType image/svg+xml "access plus 30 days"
 </IfModule>
+
+# Não deixar o cache de páginas da HostGator (nginx) guardar o HTML: atualizações aparecem na hora
+<IfModule mod_headers.c>
+<FilesMatch "\.html$">
+Header set Cache-Control "no-cache, must-revalidate"
+Header set X-Accel-Expires "0"
+</FilesMatch>
+</IfModule>
