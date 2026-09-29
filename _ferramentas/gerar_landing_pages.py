@@ -18,7 +18,7 @@ ROOT = os.environ.get('ANKOR_ROOT') or os.path.dirname(os.path.dirname(os.path.a
 GTAG = """<script async src="https://www.googletagmanager.com/gtag/js?id=G-858ZVEWJJ1"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858ZVEWJJ1');gtag('config','AW-10869641873');</script>"""
 CONVERSAO_ADS = "<script>gtag('event','conversion',{'send_to':'AW-10869641873/pZuNCIeHxeAYEJGlhr8o'});</script>"
-V = '20260929c'  # versão do CSS/JS (troque ao mudar style.css ou um JS; na home também)
+V = '20260929d'  # versão do CSS/JS (troque ao mudar style.css ou um JS; na home também)
 
 UNITS = {
   '303': dict(area='240', price='R$ 3.980.000,00', price_short='R$ 3.980.000',
@@ -333,31 +333,9 @@ def page(u, d):
       <h2 class="h2">Uma cobertura para viver Ubatuba com mais <em>espaço, conforto e sofisticação</em></h2>
       <p class="lead" style="margin-top:20px">Conheça a planta, veja as imagens reais, entenda a implantação e descubra todos os detalhes da Cobertura {u}.</p>
     </div>
-    <form class="form reveal reveal-d1" novalidate>
-      <h3>Agendar uma apresentação privativa</h3>
-      <p>Cobertura {u} · {d['area']} m² · {d['price']}</p>
-      <input type="hidden" name="interesse" value="Cobertura {u}">
-      <input type="hidden" name="objetivo" value="Agendar apresentação privativa">
-      <input type="hidden" name="origem" value="Landing page Cobertura {u}">
-      <div class="form__grid">
-        <div class="field"><label for="f-nome">Nome</label><input id="f-nome" name="nome" autocomplete="name" required></div>
-        <div class="field"><label for="f-email">E-mail</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
-        <div class="field"><label for="f-wpp">WhatsApp</label><input id="f-wpp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="(12) 99999-9999" required></div>
-        <div class="field"><label for="f-cidade">Cidade</label><input id="f-cidade" name="cidade" autocomplete="address-level2"></div>
-        <fieldset class="field field--full">
-          <legend>Formato preferido</legend>
-          <div class="choices">
-            <label><input type="radio" name="formato" value="Presencial" checked><span>Presencial</span></label>
-            <label><input type="radio" name="formato" value="Videochamada"><span>Videochamada</span></label>
-          </div>
-        </fieldset>
-        <div class="field field--full"><label for="f-msg">Mensagem (opcional)</label><textarea id="f-msg" name="mensagem" placeholder="Melhor dia e horário, dúvidas..."></textarea></div>
-      </div>
-      <label class="consent"><input type="checkbox" name="consentimento" value="sim" required>
-        <span>Concordo em receber contato da Construtora Convênio sobre o Ankor e com o uso dos meus dados para esse fim.</span></label>
-      <button type="submit" class="btn btn--primary btn--block">Agendar apresentação</button>
-      <p class="form__status" role="status" aria-live="polite"></p>
-    </form>
+    <div class="form-embed reveal reveal-d1">
+      <iframe data-respondi src="https://form.respondi.app/JDCmWvqf?embed=true" title="Formulário de contato do Ankor" loading="lazy" allow="clipboard-write"></iframe>
+    </div>
   </div>
 </section>
 </main>

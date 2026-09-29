@@ -332,6 +332,10 @@
     }
   });
 
+  /* ---------- Formulário do respondi.app: repassa as UTMs da página para o formulário ---------- */
+  var qs = window.location.search.substring(1);
+  if (qs) $$('iframe[data-respondi]').forEach(function (f) { f.src = f.getAttribute('src') + '&' + qs; });
+
   /* ---------- CTAs que pré-selecionam o interesse no formulário ---------- */
   $$('[data-interest]').forEach(function (a) {
     a.addEventListener('click', function () {
