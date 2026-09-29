@@ -18,7 +18,7 @@ ROOT = os.environ.get('ANKOR_ROOT') or os.path.dirname(os.path.dirname(os.path.a
 GTAG = """<script async src="https://www.googletagmanager.com/gtag/js?id=G-858ZVEWJJ1"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858ZVEWJJ1');gtag('config','AW-10869641873');</script>"""
 CONVERSAO_ADS = "<script>gtag('event','conversion',{'send_to':'AW-10869641873/pZuNCIeHxeAYEJGlhr8o'});</script>"
-V = '20260929d'
+V = '20260929e'
 SITE = 'https://construtoraconvenio.com.br/ankor/'  # endereço oficial (canonical e imagens de compartilhamento)  # versão do CSS/JS (troque ao mudar style.css ou um JS; na home também)
 
 UNITS = {
@@ -26,7 +26,7 @@ UNITS = {
     title='Uma cobertura única, pensada para quem valoriza <em>espaço, conforto e sofisticação</em>.',
     title_plain='Uma cobertura única, pensada para quem valoriza espaço, conforto e sofisticação.',
     sub='Ambientes amplos, varanda gourmet e solarium com vista para o mar, em uma localização privilegiada no Itaguá.',
-    hero='hero/lp-303.webp', hero_wh=(1344, 904), hero_pos='78% 100%', hero_zoom=1.2,
+    hero='hero/lp-303.webp', hero_wh=(1600, 1280), hero_pos='50% 50%', hero_zoom=1, hero_note='Foto real · varanda gourmet', hero_alt='Varanda gourmet coberta da Cobertura 303, com forro de madeira e vista para as montanhas',
     intro='coberturas/303-living-solarium.webp', view='vista/303-vista-mar.webp',
     plan='plantas/planta-303.webp', other='304', other_img='vista/304-vista-solarium-sm.webp',
     other_area='254', other_price='R$ 4.280.000,00', pos='y303'),
@@ -147,8 +147,8 @@ def page(u, d):
         <p class="lp-hero__sub">{d['sub']}</p>
       </div>
       <figure class="lp-hero__photo" style="--pos:{d['hero_pos']};--zoom:{d['hero_zoom']}">
-        <img src="../assets/img/{d['hero']}" alt="Vista para o mar a partir do solarium da Cobertura {u}" width="{d['hero_wh'][0]}" height="{d['hero_wh'][1]}" fetchpriority="high">
-        <span class="photo-note">Foto real · vista do solarium</span>
+        <img src="../assets/img/{d['hero']}" alt="{d.get('hero_alt', 'Vista para o mar a partir do solarium da Cobertura ' + u)}" width="{d['hero_wh'][0]}" height="{d['hero_wh'][1]}" fetchpriority="high">
+        <span class="photo-note">{d.get('hero_note', 'Foto real · vista do solarium')}</span>
       </figure>
     </div>
     <div class="spec-bar">

@@ -167,7 +167,7 @@
       var parts = [
         { key: 'social', label: 'Living e cozinha', items: rooms.filter(function (im) { return has(im, ['living', 'cozinha']); }) },
         { key: 'vista', label: 'Vista para o mar', items: u.filter(function (im) { return im.cat === 'vista'; }) },
-        { key: 'solarium', label: 'Solarium e área gourmet', items: rooms.filter(function (im) { return has(im, ['solarium', 'bancada']) && !has(im, ['living']); }) },
+        { key: 'solarium', label: 'Solarium e área gourmet', items: rooms.filter(function (im) { return has(im, ['solarium', 'bancada', 'varanda']) && !has(im, ['living', 'suite']); }) },
         { key: 'suites', label: 'Suítes e banheiros', items: rooms.filter(function (im) { return has(im, ['suite', 'banho', 'lavabo', 'circulacao', 'corredor']); }) },
         { key: 'serra', label: 'Vista para a serra', items: u.filter(function (im) { return im.cat === 'serra'; }) }
       ];

@@ -12,7 +12,7 @@ Requer Pillow:           python3 -m pip install pillow
   Unidade '303'/'304' faz a foto aparecer só na landing page da cobertura.
 """
 import json, os, shutil
-from PIL import Image
+from PIL import Image, ImageOps
 Image.MAX_IMAGE_PIXELS = None
 
 ROOT = os.environ.get('ANKOR_ROOT') or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -124,22 +124,27 @@ M = [
   # Plantas
   ('planta303.png', 'planta-303', 'plantas', 'Planta humanizada — Cobertura 303', '303'),
   ('planta304.png', 'planta-304', 'plantas', 'Planta humanizada — Cobertura 304', '304'),
-  # Cobertura 303 (fotos reais, unidade sem decoração)
-  (WA+'11.46.07-3.jpeg', '303-living-solarium', 'coberturas', 'Living com acesso ao solarium', '303'),
-  (WA+'11.46.07-2.jpeg', '303-living-cozinha', 'coberturas', 'Living integrado à cozinha', '303'),
-  (WA+'11.46.08-1.jpeg', '303-living', 'coberturas', 'Living amplo', '303'),
-  (WA+'11.46.08.jpeg', '303-living-2', 'coberturas', 'Living e cozinha', '303'),
-  (WA+'11.46.08-2.jpeg', '303-cozinha', 'coberturas', 'Cozinha', '303'),
-  (WA+'11.46.08-3.jpeg', '303-cozinha-2', 'coberturas', 'Cozinha integrada', '303'),
-  (WA+'11.46.06-1.jpeg', '303-suite', 'coberturas', 'Suíte', '303'),
-  (WA+'11.46.06.jpeg', '303-suite-2', 'coberturas', 'Suíte', '303'),
-  (WA+'11.46.05.jpeg', '303-circulacao', 'coberturas', 'Circulação íntima', '303'),
-  (WA+'11.46.05-2.jpeg', '303-corredor', 'coberturas', 'Corredor das suítes', '303'),
-  (WA+'11.46.06-3.jpeg', '303-banho', 'coberturas', 'Banheiro da suíte', '303'),
-  (WA+'11.46.07-1.jpeg', '303-lavabo', 'coberturas', 'Lavabo', '303'),
-  (WA+'11.46.09.jpeg', '303-solarium', 'coberturas', 'Solarium com bancada gourmet', '303'),
-  (WA+'11.46.09-3.jpeg', '303-solarium-2', 'coberturas', 'Solarium', '303'),
-  (WA+'11.46.09-2.jpeg', '303-bancada', 'coberturas', 'Bancada da área gourmet', '303'),
+  # Cobertura 303: fotos profissionais (Confector, 03/2026) + fotos com vista que só existem nas antigas
+  (WA+'11.46.07-3.jpeg', '303-living-solarium', 'coberturas', 'Living com acesso ao solarium e vista para a serra', '303'),
+  ('confector/303/Cobertura 1 - 14.jpg', '303-living-cozinha', 'coberturas', 'Living integrado à cozinha', '303'),
+  ('confector/303/Cobertura 1 - 12.jpg', '303-living', 'coberturas', 'Living amplo', '303'),
+  ('confector/303/Cobertura 1 - 13.jpg', '303-living-2', 'coberturas', 'Living com iluminação natural', '303'),
+  ('confector/303/Cobertura 1 - 11.jpg', '303-cozinha', 'coberturas', 'Cozinha', '303'),
+  ('confector/303/Cobertura 1 - 15.jpg', '303-varanda-gourmet', 'coberturas', 'Varanda gourmet coberta', '303'),
+  ('confector/303/Cobertura 1 - 18.jpg', '303-varanda', 'coberturas', 'Varanda com guarda-corpo de vidro', '303'),
+  (WA+'11.46.09.jpeg', '303-solarium', 'coberturas', 'Solarium com vista para a serra', '303'),
+  ('confector/303/Cobertura 1 - 17.jpg', '303-solarium-bancada', 'coberturas', 'Solarium com bancada gourmet', '303'),
+  ('confector/303/Cobertura 1 - 16.jpg', '303-solarium-amplo', 'coberturas', 'Solarium amplo', '303'),
+  ('confector/303/Cobertura 1 - 09.jpg', '303-suite', 'coberturas', 'Suíte', '303'),
+  ('confector/303/Cobertura 1 - 05.jpg', '303-suite-varanda', 'coberturas', 'Suíte com acesso à varanda', '303'),
+  ('confector/303/Cobertura 1 - 07.jpg', '303-suite-2', 'coberturas', 'Suíte com porta de correr', '303'),
+  ('confector/303/Cobertura 1 - 06.jpg', '303-suite-3', 'coberturas', 'Suíte', '303'),
+  ('confector/303/Cobertura 1 - 03.jpg', '303-suite-4', 'coberturas', 'Suíte', '303'),
+  ('confector/303/Cobertura 1 - 04.jpg', '303-suite-5', 'coberturas', 'Suíte', '303'),
+  ('confector/303/Cobertura 1 - 10.jpg', '303-banho', 'coberturas', 'Banheiro da suíte', '303'),
+  ('confector/303/Cobertura 1 - 08.jpg', '303-banho-2', 'coberturas', 'Banheiro da suíte', '303'),
+  ('confector/303/Cobertura 1 - 01.jpg', '303-circulacao', 'coberturas', 'Circulação íntima', '303'),
+  ('confector/303/Cobertura 1 - 02.jpg', '303-lavabo', 'coberturas', 'Lavabo', '303'),
   # Vista 303
   (WA+'11.46.10-2.jpeg', '303-vista-solarium', 'vista', 'Vista a partir do solarium da Cobertura 303', '303'),
   (WA+'11.46.10-3.jpeg', '303-vista-mar', 'vista', 'Vista lateral para o mar — Cobertura 303', '303'),
@@ -147,26 +152,29 @@ M = [
   (WA+'11.46.07.jpeg', '303-vista-marina', 'vista', 'Vista para a Marina — Cobertura 303', '303'),
   (WA+'11.46.10-1.jpeg', '303-vista-verde', 'serra', 'Vista para a serra a partir do solarium — Cobertura 303', '303'),
   (WA+'11.46.10.jpeg', '303-vista-lateral', 'serra', 'Vista para a serra a partir do solarium — Cobertura 303', '303'),
-  # Cobertura 304
-  (WA+'11.47.05-3.jpeg', '304-living-solarium', 'coberturas', 'Living com acesso ao solarium', '304'),
-  (WA+'11.47.07.jpeg', '304-living-cozinha', 'coberturas', 'Living integrado à cozinha', '304'),
-  (WA+'11.47.06.jpeg', '304-living', 'coberturas', 'Living amplo', '304'),
-  (WA+'11.47.06-1.jpeg', '304-living-2', 'coberturas', 'Living', '304'),
-  (WA+'11.47.07-1.jpeg', '304-living-3', 'coberturas', 'Living com iluminação natural', '304'),
-  (WA+'11.47.06-3.jpeg', '304-cozinha', 'coberturas', 'Cozinha integrada', '304'),
-  (WA+'11.47.06-4.jpeg', '304-cozinha-2', 'coberturas', 'Cozinha', '304'),
-  (WA+'11.47.03-1.jpeg', '304-suite-varanda', 'coberturas', 'Suíte com varanda', '304'),
-  (WA+'11.47.04.jpeg', '304-suite', 'coberturas', 'Suíte', '304'),
-  (WA+'11.47.03.jpeg', '304-suite-2', 'coberturas', 'Suíte', '304'),
-  (WA+'11.47.03-2.jpeg', '304-suite-3', 'coberturas', 'Suíte', '304'),
-  (WA+'11.47.05-1.jpeg', '304-suite-4', 'coberturas', 'Suíte', '304'),
-  (WA+'11.47.05-2.jpeg', '304-suite-5', 'coberturas', 'Suíte', '304'),
-  (WA+'11.47.07-2.jpeg', '304-circulacao', 'coberturas', 'Circulação', '304'),
-  (WA+'11.47.06-2.jpeg', '304-banho', 'coberturas', 'Banheiro da suíte', '304'),
-  (WA+'11.47.07-3.jpeg', '304-lavabo', 'coberturas', 'Lavabo', '304'),
-  (WA+'11.47.08-3.jpeg', '304-solarium', 'coberturas', 'Solarium com bancada gourmet', '304'),
-  (WA+'11.47.08.jpeg', '304-solarium-2', 'coberturas', 'Solarium', '304'),
-  (WA+'11.47.08-1.jpeg', '304-solarium-3', 'coberturas', 'Solarium', '304'),
+  # Cobertura 304: fotos profissionais (Confector, 03/2026) + fotos com vista que só existem nas antigas
+  ('confector/304/Cobertura 2-12.jpg', '304-living-cozinha', 'coberturas', 'Living integrado à cozinha', '304'),
+  (WA+'11.47.05-3.jpeg', '304-living-solarium', 'coberturas', 'Living com acesso ao solarium e vista para a serra', '304'),
+  ('confector/304/Cobertura 2-14.jpg', '304-living', 'coberturas', 'Living amplo', '304'),
+  ('confector/304/Cobertura 2-13.jpg', '304-living-2', 'coberturas', 'Living com acesso ao solarium', '304'),
+  ('confector/304/Cobertura 2-15.jpg', '304-cozinha', 'coberturas', 'Cozinha', '304'),
+  ('confector/304/Cobertura 2-16.jpg', '304-varanda-gourmet', 'coberturas', 'Varanda gourmet coberta', '304'),
+  (WA+'11.47.08-3.jpeg', '304-solarium', 'coberturas', 'Solarium com vista para a serra', '304'),
+  ('confector/304/Cobertura 2 - 18.jpg', '304-solarium-amplo', 'coberturas', 'Solarium amplo', '304'),
+  ('confector/304/Cobertura 2-17.jpg', '304-solarium-varanda', 'coberturas', 'Solarium e varanda gourmet', '304'),
+  (WA+'11.47.03-1.jpeg', '304-suite-varanda', 'coberturas', 'Suíte com varanda e vista', '304'),
+  ('confector/304/Cobertura 2 - 2.jpg', '304-suite', 'coberturas', 'Suíte', '304'),
+  ('confector/304/Cobertura 2-4.jpg', '304-suite-2', 'coberturas', 'Suíte com acesso à varanda', '304'),
+  ('confector/304/Cobertura 2-6.jpg', '304-suite-3', 'coberturas', 'Suíte com varanda', '304'),
+  ('confector/304/Cobertura 2-9.jpg', '304-suite-4', 'coberturas', 'Suíte com varanda', '304'),
+  ('confector/304/Cobertura 2-10.jpg', '304-suite-5', 'coberturas', 'Suíte', '304'),
+  ('confector/304/Cobertura 2-8.jpg', '304-suite-6', 'coberturas', 'Suíte', '304'),
+  ('confector/304/Cobertura 2 - 3.jpg', '304-suite-7', 'coberturas', 'Suíte', '304'),
+  ('confector/304/Cobertura 2-11.jpg', '304-banho', 'coberturas', 'Banheiro da suíte', '304'),
+  ('confector/304/Cobertura 2 - 5.jpg', '304-banho-2', 'coberturas', 'Banheiro da suíte', '304'),
+  ('confector/304/Cobertura 2-7.jpg', '304-banho-3', 'coberturas', 'Banheiro da suíte', '304'),
+  ('confector/304/Cobertura 2 - 1.jpg', '304-circulacao', 'coberturas', 'Circulação íntima', '304'),
+  ('confector/304/Cobertura 2 - 01.jpg', '304-lavabo', 'coberturas', 'Lavabo', '304'),
   # Vista 304
   (WA+'11.47.08-2.jpeg', '304-vista-solarium', 'vista', 'Vista a partir do solarium da Cobertura 304', '304'),
   (WA+'11.47.09.jpeg', '304-vista-mar', 'vista', 'Vista lateral para o mar — Cobertura 304', '304'),
@@ -178,7 +186,7 @@ M = [
 data = []
 os.makedirs(OUT, exist_ok=True)
 for fn, slug, cat, cap, unit in M:
-    im = Image.open(os.path.join(SRC, fn))
+    im = ImageOps.exif_transpose(Image.open(os.path.join(SRC, fn)))
     is_plan = fn.startswith('planta')
     if is_plan:
         im = im.convert('RGBA')
@@ -218,7 +226,11 @@ for i, fn in enumerate(['foto1.png', 'foto3.png', 'foto2.png', 'foto4.jpg', 'fot
         c.save(os.path.join(HERO, f'hero-{i}-{w}.webp'), 'WEBP', quality=q, method=6)
 
 # Topo das landing pages e foto aérea da localização (tamanho original, qualidade 88)
-for fn, out in (('hero-cobertura-303.png', 'hero/lp-303.webp'), ('hero-cobertura-304.png', 'hero/lp-304.webp'),
+# 303: foto profissional da varanda gourmet (vertical), recortada em 5:4 na parte com o forro e as montanhas
+im = ImageOps.exif_transpose(Image.open(os.path.join(SRC, 'confector/303/Cobertura 1 - 15.jpg'))).convert('RGB')
+ch = round(im.width * 4 / 5); top = round((im.height - ch) * 0.35)
+im.crop((0, top, im.width, top + ch)).resize((1600, 1280), Image.LANCZOS).save(os.path.join(OUT, 'hero/lp-303.webp'), 'WEBP', quality=86, method=6)
+for fn, out in (('hero-cobertura-304.png', 'hero/lp-304.webp'),
                 ('localizacao-aerea.png', 'localizacao/aerea-baia-ankor.webp')):
     Image.open(os.path.join(SRC, fn)).convert('RGB').save(os.path.join(OUT, out), 'WEBP', quality=88, method=6)
 
