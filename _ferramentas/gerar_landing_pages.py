@@ -17,7 +17,7 @@ UNITS = {
     title='Uma cobertura única, pensada para quem valoriza <em>espaço, conforto e sofisticação</em>.',
     title_plain='Uma cobertura única, pensada para quem valoriza espaço, conforto e sofisticação.',
     sub='Ambientes amplos, varanda gourmet e solarium com vista para o mar, em uma localização privilegiada no Itaguá.',
-    hero='hero/lp-303.webp', hero_wh=(1344, 904), hero_pos='62% 50%',
+    hero='hero/lp-303.webp', hero_wh=(1344, 904), hero_pos='78% 100%', hero_zoom=1.45,
     intro='coberturas/303-living-solarium.webp', view='vista/303-vista-mar.webp',
     plan='plantas/planta-303.webp', other='304', other_img='vista/304-vista-solarium-sm.webp',
     other_area='254', other_price='R$ 4.280.000,00', pos='y303'),
@@ -25,7 +25,7 @@ UNITS = {
     title='A amplitude de uma cobertura pensada para viver Ubatuba com <em>conforto e sofisticação</em>.',
     title_plain='A amplitude de uma cobertura pensada para viver Ubatuba com conforto e sofisticação.',
     sub='Ambientes integrados, varanda gourmet e solarium com vista para o mar, em uma localização privilegiada no Itaguá.',
-    hero='hero/lp-304.webp', hero_wh=(1344, 1058), hero_pos='40% 88%',
+    hero='hero/lp-304.webp', hero_wh=(1344, 1058), hero_pos='30% 100%', hero_zoom=1.4,
     intro='coberturas/304-living-cozinha.webp', intro_alt='Living amplo integrado à cozinha da Cobertura {u}', view='vista/304-vista-mar.webp',
     plan='plantas/planta-304.webp', other='303', other_img='vista/303-vista-solarium-sm.webp',
     other_area='240', other_price='R$ 3.980.000,00', pos='y304'),
@@ -126,12 +126,18 @@ def page(u, d):
 <main>
 <!-- 1. HERO -->
 <section class="lp-hero">
-  <div class="lp-hero__bg"><img src="../assets/img/{d['hero']}" alt="Vista para o mar a partir do solarium da Cobertura {u}" width="{d['hero_wh'][0]}" height="{d['hero_wh'][1]}" fetchpriority="high" style="object-position:{d.get('hero_pos', '50% 50%')}"></div>
-  <span class="photo-note">Foto real · vista do solarium</span>
   <div class="container lp-hero__content">
-    <p class="eyebrow">Cobertura {u} · Ankor Exclusive Residence</p>
-    <h1 class="h1">{d['title']}</h1>
-    <p class="lp-hero__sub">{d['sub']}</p>
+    <div class="lp-hero__grid">
+      <div class="lp-hero__text">
+        <p class="eyebrow">Cobertura {u} · Ankor Exclusive Residence</p>
+        <h1 class="h1">{d['title']}</h1>
+        <p class="lp-hero__sub">{d['sub']}</p>
+      </div>
+      <figure class="lp-hero__photo" style="--pos:{d['hero_pos']};--zoom:{d['hero_zoom']}">
+        <img src="../assets/img/{d['hero']}" alt="Vista para o mar a partir do solarium da Cobertura {u}" width="{d['hero_wh'][0]}" height="{d['hero_wh'][1]}" fetchpriority="high">
+        <span class="photo-note">Foto real · vista do solarium</span>
+      </figure>
+    </div>
     <div class="spec-bar">
       <div class="spec-bar__price"><small>Valor</small><strong>{d['price']}</strong></div>
       <ul class="spec-bar__list">
