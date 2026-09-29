@@ -169,14 +169,19 @@ cd ~/Documents/Sites/Ankor && python3 -m http.server 8765
 ```
 Abra http://localhost:8765 (use Cmd+Shift+R para limpar o cache depois de mudanças).
 
-**Publicar uma atualização da prévia** (GitHub Pages atualiza em cerca de 1 a 2 minutos):
-```
-git add -A && git commit -m "Descrição do ajuste" && git push
-```
+**Site no ar:** https://construtoraconvenio.com.br/ankor/ (HostGator, pasta `public_html/ankor`,
+desde 29/09/2026). O WordPress antigo do /ankor foi renomeado para `public_html/ankor_antigo`.
+A prévia do GitHub Pages foi desativada; o GitHub (`erichprates/ankor-site`) é só o histórico.
 
-**Publicação definitiva:** envie o conteúdo da pasta para o servidor da Convênio, **sem** as
-pastas `_originais/` e `_ferramentas/`. Todos os caminhos são relativos, então o site funciona
-em qualquer pasta (por exemplo, `construtoraconvenio.com.br/ankor/`).
+**Publicar uma atualização:**
+1. `sh _ferramentas/empacotar.sh` (gera as LPs e cria `_deploy/ankor.zip`, sem tour, ferramentas e originais).
+2. No cPanel, Gerenciador de Arquivos, `public_html/ankor`: envie o zip, extraia sobrescrevendo e apague o zip.
+3. Limpe o cache da HostGator (o servidor guarda páginas: cabeçalho `x-nginx-cache: WordPress`),
+   senão a versão antiga pode continuar aparecendo por algumas horas.
+4. `git add -A && git commit -m "..." && git push` para guardar o histórico.
+
+O `.htaccess` redireciona os endereços do WordPress antigo (cobertura303, cobertura304,
+obrigadocorretor, outroimovel, corretores) e manda endereços inexistentes para a home.
 
 ---
 
