@@ -18,7 +18,7 @@ ROOT = os.environ.get('ANKOR_ROOT') or os.path.dirname(os.path.dirname(os.path.a
 GTAG = """<script async src="https://www.googletagmanager.com/gtag/js?id=G-858ZVEWJJ1"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858ZVEWJJ1');gtag('config','AW-10869641873');</script>"""
 CONVERSAO_ADS = "<script>gtag('event','conversion',{'send_to':'AW-10869641873/pZuNCIeHxeAYEJGlhr8o'});</script>"
-V = '20260929e'
+V = '20260929g'
 SITE = 'https://construtoraconvenio.com.br/ankor/'  # endereço oficial (canonical e imagens de compartilhamento)  # versão do CSS/JS (troque ao mudar style.css ou um JS; na home também)
 
 UNITS = {
@@ -332,10 +332,15 @@ def page(u, d):
 <!-- 10. CTA FINAL + FORMULÁRIO -->
 <section class="section section--dark" id="agendar">
   <div class="container contact">
-    <div class="reveal">
+    <div class="contact__text reveal">
       <p class="eyebrow">Apresentação privativa</p>
       <h2 class="h2">Uma cobertura para viver Ubatuba com mais <em>espaço, conforto e sofisticação</em></h2>
       <p class="lead" style="margin-top:20px">Conheça a planta, veja as imagens reais, entenda a implantação e descubra todos os detalhes da Cobertura {u}.</p>
+      <ul class="contact__points">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg>Apresentação presencial ou por videochamada</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6M3 21h18"/></svg>Atendimento direto com a Construtora Convênio</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0112 2.5a7 7 0 017 7C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Av. Leovigildo Dias Vieira, 1724 · Itaguá, Ubatuba</li>
+      </ul>
     </div>
     <div class="form-embed reveal reveal-d1">
       <iframe data-respondi src="https://form.respondi.app/JDCmWvqf?embed=true" title="Formulário de contato do Ankor" loading="lazy" allow="clipboard-write"></iframe>
