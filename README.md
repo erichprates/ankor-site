@@ -145,7 +145,11 @@ pelo cliente estão no fim do arquivo, em "Ajustes de finalização".
 | Cobre claro | `#c9823b` | selo "100% entregue", "exclusivo" em itálico |
 | Areia | `#f5ede7` | seções claras |
 
-Fontes: **Cormorant Garamond** (títulos) e **Manrope** (textos), via Google Fonts.
+Fontes: **Cormorant Garamond** (títulos) e **Manrope** (textos e preços), via Google Fonts.
+
+**Cache:** o CSS e os JS são chamados com `?v=AAAAMMDD…` (em `index.html` e no
+`gerar_landing_pages.py`). Ao mudar `style.css` ou um JS, troque esse número nos dois lugares
+(e gere as LPs), senão celulares podem continuar mostrando a versão antiga.
 
 ---
 

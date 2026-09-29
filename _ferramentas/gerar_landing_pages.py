@@ -17,7 +17,7 @@ UNITS = {
     title='Uma cobertura única, pensada para quem valoriza <em>espaço, conforto e sofisticação</em>.',
     title_plain='Uma cobertura única, pensada para quem valoriza espaço, conforto e sofisticação.',
     sub='Ambientes amplos, varanda gourmet e solarium com vista para o mar, em uma localização privilegiada no Itaguá.',
-    hero='hero/lp-303.webp', hero_wh=(1344, 904), hero_pos='78% 100%', hero_zoom=1.45,
+    hero='hero/lp-303.webp', hero_wh=(1344, 904), hero_pos='78% 100%', hero_zoom=1.2,
     intro='coberturas/303-living-solarium.webp', view='vista/303-vista-mar.webp',
     plan='plantas/planta-303.webp', other='304', other_img='vista/304-vista-solarium-sm.webp',
     other_area='254', other_price='R$ 4.280.000,00', pos='y303'),
@@ -101,7 +101,7 @@ def page(u, d):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="../assets/img/{d['hero']}" fetchpriority="high">
-<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/style.css?v=20260929b">
 <script>(function(w,d,s,l,i){{w[l]=w[l]||[];w[l].push({{'gtm.start':new Date().getTime(),event:'gtm.js'}});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);}})(window,document,'script','dataLayer','GTM-N2VF7FVX');</script>
 <script>!function(f,b,e,v,n,t,s){{if(f.fbq)return;n=f.fbq=function(){{n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)}};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','279593157240250');fbq('track','PageView');fbq('track','ViewContent',{{content_name:'Cobertura {u}'}});</script>
 </head>
@@ -375,9 +375,9 @@ def page(u, d):
   <a href="#" class="btn btn--primary" data-whatsapp="Olá! Tenho interesse na Cobertura {u} do Ankor." hidden>WhatsApp</a>
 </div>
 
-<script src="../assets/js/config.js"></script>
-<script src="../assets/js/data.js"></script>
-<script src="../assets/js/main.js"></script>
+<script src="../assets/js/config.js?v=20260929b"></script>
+<script src="../assets/js/data.js?v=20260929b"></script>
+<script src="../assets/js/main.js?v=20260929b"></script>
 </body>
 </html>
 '''
