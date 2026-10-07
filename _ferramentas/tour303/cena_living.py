@@ -26,6 +26,9 @@ SAVE = arg('--save', '')
 # Cobertura: a 304 é a 303 espelhada (fachada do outro lado do prédio; o terraço das duas aponta para o mesmo lado).
 # O modelo é sempre montado nas coordenadas da 303 e, para a 304, tudo é espelhado no fim (ver "ESPELHO 304").
 APTO = arg('--apto', '303')
+# --mascara: em vez da imagem, grava <ambiente>_mask.png com alfa = 0 onde se vê a paisagem (inclusive através dos vidros).
+# Serve para recolocar a vista real depois do refinamento por IA, que redesenha a imagem inteira.
+MASCARA = '--mascara' in argv
 HERE = os.path.dirname(os.path.abspath(__file__))
 ORIG = os.path.abspath(os.path.join(HERE, '..', '..', '_originais'))
 os.makedirs(OUT, exist_ok=True)
@@ -1032,7 +1035,10 @@ for name, s in SHOTS.items():
     else:
         scene.render.resolution_x, scene.render.resolution_y = int(RES * 0.5), int(RES * 0.5 * 9 / 16)
     scene.render.resolution_percentage = 100
-    scene.render.filepath = os.path.join(OUT, name + '.png')
+    scene.render.filepath = os.path.join(OUT, name + ('_mask' if MASCARA else '') + '.png')
+    if MASCARA:
+        scene.render.film_transparent = True; scene.cycles.film_transparent_glass = True
+        scene.cycles.samples = 12; scene.render.image_settings.color_mode = 'RGBA'
     print('RENDER', name, scene.render.resolution_x, scene.render.resolution_y, flush=True)
     bpy.ops.render.render(write_still=True)
 

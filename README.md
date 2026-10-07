@@ -171,8 +171,8 @@ Abra http://localhost:8765 (use Cmd+Shift+R para limpar o cache depois de mudan�
 
 **Site no ar:** https://construtoraconvenio.com.br/ankor/ (HostGator, pasta `public_html/ankor`,
 desde 29/09/2026). O WordPress antigo do /ankor foi renomeado para `public_html/ankor_antigo`.
-O GitHub Pages publica só o **tour 360°** (ramo `gh-pages`, que tem apenas `tour-303/`, a planta,
-o logo e o favicon): https://erichprates.github.io/ankor-site/tour-303/ . A raiz da prévia
+O GitHub Pages publica só os **tours 360°** (ramo `gh-pages`, que tem apenas `tour-303/`, `tour-304/`, as plantas,
+o logo e o favicon): https://erichprates.github.io/ankor-site/tour-303/ e `/tour-304/` . A raiz da prévia
 redireciona para o site oficial. Para atualizar o tour lá, copie os arquivos para o ramo `gh-pages`
 (por exemplo com `git worktree add ../ghp gh-pages`), faça commit e push. O ramo `main` é o histórico do site.
 
@@ -274,8 +274,7 @@ e publicar no GitHub Pages (seção 8).
 
 ## 8. Tour 360° das Coberturas 303 e 304 (em construção; piloto da 303 com 3 ambientes publicado em 28/09/2026)
 
-Pasta `tour-303/` (não linkada no site). **No GitHub Pages** continuam os 3 ambientes refinados do piloto (Terraço, Living
-e jantar, Cozinha). **No ramo `main`**, desde 07/10/2026, `tour-303/` tem a página nova e os 10 ambientes em **render cru do
+Pasta `tour-303/` (não linkada no site). **No GitHub Pages** estão os dois tours completos e refinados (desde 08/10/2026). **No ramo `main`**, desde 07/10/2026, `tour-303/` tem a página nova e os 10 ambientes em **render cru do
 Blender** (sem refinamento por IA): Living e jantar, Cozinha, Terraço, Deck e jacuzzi, Suíte master, Suíte 2, Suíte 3 e os
 três WCs. As imagens refinadas antigas estão no histórico do Git e no ramo `gh-pages`. **Não publicar o `main` no Pages
 antes do refinamento.**
@@ -302,6 +301,26 @@ WC master usam `paisagem_360_real_quartos.png`, e na 304 também living e cozinh
 mudam de direção entre a fachada dos quartos e o terraço; a calibração está comentada no script).
 **Pendente na 304:** (1) cliente conferir a direção das vistas; (2) oliveira nas suítes 2 e 3 (sem espaço) e demais móveis das referências ficam para o refinamento;
 (3) conferir a 304 no DWG; (4) conferir no navegador os pontos da planta e os botões entre ambientes.
+
+**Refinamento por IA (07/10/2026, aprovado pelo cliente nas duas coberturas):** os 20 ambientes de `tour-303/img` e
+`tour-304/img` são as versões refinadas na Higgsfield (GPT Image 2.5, qualidade alta, 4K, 21:9, 4,25 créditos por geração),
+esticadas para 2:1 por `restaurar_vista.py`. A vista é a que a IA reproduz a partir do render (não se cola a foto por cima:
+a colagem pela máscara deixava bordas nas janelas). Originais da IA, versões anteriores e consertos ficam em
+`_ferramentas/tour303/render/higgsfield/` (`resultados/`, `antes/`, `emenda/`; fora do Git). Deck e terraço da 303 têm
+retoque manual do cliente no Photoshop.
+- Conexão: conector local `higgsfield2` do Claude Code (`claude mcp add --transport http higgsfield2 https://mcp.higgsfield.ai/mcp`),
+  porque a conta com crédito não é a do claude.ai. As imagens entram por URL pública (`media_import_url`): renders já
+  commitados via raw.githubusercontent.com; arquivos soltos, num ramo temporário do repositório.
+- Prompt base: manter geometria, câmera, posição e tamanho de cada móvel, projeção de ponta a ponta e a paisagem; só
+  melhorar o realismo. Referências: o living já refinado (estilo), a foto real nos banhos (revestimentos).
+- **Emenda lateral:** a IA não casa as pontas do 360°. Conserto: `emenda.py girar` (leva a costura ao centro), pedir à IA
+  para consertar só a costura central, `emenda.py aplicar` (aproveita só a faixa). Se algo importante cai na emenda
+  (jacuzzi do terraço da 304), girar o RENDER antes de refinar para a emenda cair numa parede lisa e desfazer o giro depois.
+- **Consistência entre ambientes:** o que se vê pela porta de um WC, ou um objeto que aparece em duas imagens (vaso, jacuzzi),
+  a IA inventa diferente em cada uma. Corrigir com edição pontual passando a outra imagem como referência, e descrever a
+  posição conferindo no modelo 3D (o erro da jacuzzi "atrás das espreguiçadeiras" foi de descrição).
+- Edição pontual: pedir "mude só X, mantenha o resto idêntico" e aplicar só a região. Quando a região não fecha limpa,
+  usar a imagem inteira da edição ou gerar de novo; montagens pequenas ficaram visíveis e o cliente rejeitou.
 
 **Regras aprendidas (valem para a 304):**
 - Ponto do tour a menos de ~1,8 m de um guarda-corpo de vidro enxerga, pelo vidro, abaixo de onde a foto da vista termina
@@ -356,17 +375,26 @@ do vidro do guarda-corpo (até 1,25 m) **não estão na planta**: são estimativ
 5. Exportar em WebP 4096×2048 para `tour-303/img/<ambiente>.webp` e incluir o ambiente em `ROOMS` no `tour-303/index.html`.
    Visualizador: Pannellum (CDN); no celular roda só na horizontal.
 
-**Publicado para o cliente:** https://erichprates.github.io/ankor-site/tour-303/ (sem link no site, sem nota de "ilustrativo" a pedido).
-Ainda com a paisagem antiga de IA e só 3 ambientes; os renders novos estão em `_ferramentas/tour303/render/v5/` (fora do Git).
+**Publicado (08/10/2026):** https://erichprates.github.io/ankor-site/tour-303/ e https://erichprates.github.io/ankor-site/tour-304/
+(10 ambientes refinados cada; sem link no site, sem nota de "ilustrativo" a pedido).
 
-**Recursos do visualizador:** começa no Terraço; pré-carrega todos os ambientes em segundo plano (troca ~0,3 s);
-gira sozinho a 2°/s, para quando a pessoa toca/arrasta e volta após 8 s parado; no celular só na horizontal.
+**Recursos do visualizador (07/10/2026):** começa no Living virado para o terraço; pré-carrega os outros ambientes em
+segundo plano; gira sozinho a 2°/s; ao soltar depois de arrastar, a imagem desliza e segue girando para o mesmo lado
+(6°/s por 6 s, depois 2°/s). Menu e avisos só aparecem depois do carregamento; ao carregar, uma mão animada move o ambiente
+uma vez ("Arraste para olhar em volta").
+- **Computador:** barra de ambientes no rodapé (setas quando não cabe, botão de esconder) com a planta ao lado; zoom e tela cheia.
+- **Celular (em pé ou deitado, sem obrigar a girar):** só o botão "Ambientes", que abre um painel com a planta e os dez
+  ambientes em duas colunas; sem botões de zoom; tela cheia some onde o navegador não permite (iPhone); aviso
+  "A experiência é ainda melhor no computador". Usa as imagens leves de `img/m/` (2560 px, ~200 KB; as de `img/` têm
+  4096 px, ~900 KB). **Ao trocar uma imagem, gerar de novo a versão de `img/m/`** e mudar o `?v=` em `src()`.
+- Campo de visão: 110° deitado/computador e 75° em pé, definido antes de carregar (só muda se girar o aparelho).
+- Pontos na planta: os das suítes ficam do lado da janela, afastados dos de WC, para facilitar o toque.
 
 **Ajustes no modelo em 07/10/2026:** vista real como mundo; o painel de pedra do muro do terraço é a **ducha externa**: voltou ao modelo com braço, ducha e
 registros (sem eles o refinamento o transformava em "porta"); muro de divisa cinza; plafons pretos no corredor da varanda;
 suíte master sem bancada, com painel ripado, pendentes e painel de TV em madeira escura; banhos com cuba oca e misturador; guarda-corpo, piso e forro da varanda estendidos por toda a fachada; muretas descem até a laje e ganharam
 pingadeira de pedra clara (o topo branco refletia o céu e parecia uma fresta azul); vidro embutido na mureta.
 
-**Pendências:** refinar na Higgsfield os 10 ambientes (conectar a conta nova em `/mcp`) e recolocar a vista real;
+**Pendências:** decidir onde linkar os tours no site (LPs das coberturas) e, se for o caso, levá-los para a HostGator;
 conferir no deck, pelo vidro do guarda-corpo, se ainda aparece a faixa lisa onde as fotos acabam (~34 a 37° abaixo do horizonte); vistas reais dos quartos (o usuário vai enviar);
 vista real da 304 (`ap-304.jpg`) e tour da 304; lavabo e corredor não modelados; retorno do cliente.

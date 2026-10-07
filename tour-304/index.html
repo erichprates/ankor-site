@@ -14,7 +14,7 @@
 <style>
   :root { --ink:#2e2f2a; --ink-deep:#1f201c; --peach:#ffe5d4; --copper:#ac6620; --copper-light:#c9823b; }
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; background: var(--ink-deep); color: var(--peach); font-family: "Manrope", system-ui, sans-serif; overflow: hidden; }
+  html, body { margin: 0; height: 100%; height: 100dvh; background: var(--ink-deep); color: var(--peach); font-family: "Manrope", system-ui, sans-serif; overflow: hidden; }
   #pano { position: fixed; inset: 0; }
   .top { position: fixed; top: 0; left: 0; right: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 16px;
          padding: 16px clamp(16px, 3vw, 32px); background: linear-gradient(180deg, rgba(20,20,18,.75), rgba(20,20,18,0)); pointer-events: none; }
@@ -74,8 +74,11 @@
   .switch button[aria-pressed="true"] { background: var(--copper); color: #fff; }
   .note { position: fixed; right: clamp(12px, 2vw, 24px); bottom: clamp(12px, 2vw, 24px); z-index: 5; max-width: 300px; font-size: 11.5px; line-height: 1.5;
           color: rgba(255,229,212,.7); background: rgba(31,32,28,.7); padding: 10px 14px; border-radius: 12px; }
-  .hint { position: fixed; left: 50%; top: 30%; z-index: 6; transform: translate(-50%, -50%); pointer-events: none; text-align: center;
-          background: rgba(31,32,28,.72); padding: 14px 20px; border-radius: 14px; font-size: 14px; transition: opacity .6s; }
+  .hint { position: fixed; left: 50%; top: 46%; z-index: 6; transform: translate(-50%, -50%); pointer-events: none; text-align: center;
+          display: flex; flex-direction: column; align-items: center; gap: 10px; color: #fff; font-size: 13px; font-weight: 600;
+          text-shadow: 0 1px 10px rgba(0,0,0,.6); transition: opacity .6s; }
+  .hint svg { width: 54px; height: 54px; filter: drop-shadow(0 2px 8px rgba(0,0,0,.45)); animation: arrasta 2.2s ease-in-out infinite; }
+  @keyframes arrasta { 0%, 100% { transform: translateX(-34px) rotate(-8deg); } 50% { transform: translateX(34px) rotate(8deg); } }
   .hint.is-hidden { opacity: 0; }
   /* hotspots */
   /* O Pannellum ancora o canto do elemento no ponto; por isso o hotspot tem tamanho zero e a pílula se centraliza nele. */
@@ -110,14 +113,46 @@
   .pnlm-fullscreen-toggle-button { margin-top: 8px !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffe5d4' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5'/%3E%3C/svg%3E") !important; }
   .pnlm-fullscreen-toggle-button-active { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffe5d4' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5'/%3E%3C/svg%3E") !important; }
   .pnlm-panorama-info { display: none !important; }
-  /* Celular: o tour roda só na horizontal */
-  .rotate { position: fixed; inset: 0; z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
-            background: var(--ink-deep); color: var(--peach); text-align: center; padding: 24px; }
-  .rotate svg { width: 72px; height: 72px; color: var(--copper-light); animation: turn 2.4s ease-in-out infinite; }
-  .rotate strong { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 30px; }
-  .rotate span { font-size: 14px; color: rgba(255,229,212,.7); }
+  /* Celular em pé: o tour funciona; só sugerimos girar (aviso pequeno que some sozinho) */
+  .rotate { position: fixed; left: 50%; top: 84px; z-index: 6; transform: translateX(-50%); display: none; align-items: center; gap: 10px; white-space: nowrap;
+            background: rgba(31,32,28,.72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: var(--peach);
+            padding: 9px 14px; border-radius: 999px; font-size: 12.5px; pointer-events: none; transition: opacity .6s; }
+  .rotate svg { width: 20px; height: 20px; color: var(--copper-light); flex: none; animation: turn 2.4s ease-in-out infinite; }
+  .rotate strong { font-weight: 600; } .rotate span { display: none; }
+  .rotate.is-hidden { opacity: 0; }
   @keyframes turn { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
-  @media (orientation: portrait) and (pointer: coarse) and (max-width: 900px) { .rotate { display: flex; } }
+  @media (orientation: portrait) and (pointer: coarse) and (max-width: 900px) {
+    .map { display: none; }
+    .brand img { width: 112px; } .brand a { display: none; }
+    .hint { top: 42%; }
+  }
+  /* ---- Celular: em vez da barra, o botão "Ambientes" abre um painel com a planta e todos os ambientes ---- */
+  /* enquanto o primeiro ambiente carrega, nada de menu, planta ou avisos */
+  body.carregando .dock, body.carregando .reabrir, body.carregando .rotate { visibility: hidden; }
+  body.celular .rotate { display: flex; }
+  body.sem-tela-cheia .pnlm-fullscreen-toggle-button { display: none !important; }
+  body.celular .pnlm-zoom-controls { display: none !important; }      /* no celular o zoom é com dois dedos */
+  body.celular .pnlm-fullscreen-toggle-button { margin-top: 0 !important; }
+  body.celular .dock { left: 0; right: 0; bottom: 0; flex-direction: column; align-items: stretch; gap: 12px; pointer-events: auto;
+        padding: 48px 14px calc(16px + env(safe-area-inset-bottom)); max-height: 88dvh; overflow-y: auto;
+        background: rgba(31,32,28,.95); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+        border-top: 1px solid rgba(255,229,212,.16); border-radius: 22px 22px 0 0; }
+  body.celular .dock::before { content: "Ambientes"; position: absolute; left: 18px; top: 16px; font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--copper-light); }
+  body.celular .dock .map { display: block; width: 100%; padding: 8px 12px; box-shadow: none; }
+  body.celular .panel { display: block; margin: 0; padding: 0; background: none; border: 0; border-radius: 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  body.celular .rooms { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; overflow: visible; border-radius: 0; }
+  body.celular .rooms button { text-align: center; padding: 13px 8px; font-size: 14px; border-radius: 12px; border: 1px solid rgba(255,229,212,.2); background: rgba(255,229,212,.05); }
+  body.celular .rooms button::before { display: none; }
+  body.celular .rooms button[aria-pressed="true"] { background: var(--peach); border-color: var(--peach); }
+  body.celular .panel .prev, body.celular .panel .next { display: none !important; }
+  body.celular .panel .fechar { position: absolute; right: 10px; top: 6px; width: 40px; height: 40px; margin: 0; border: 0; border-radius: 50%; background-size: 18px; }
+  body.celular .reabrir { padding: 11px 18px 11px 14px; font-size: 13.5px; bottom: calc(14px + env(safe-area-inset-bottom)); }
+  @media (orientation: landscape) {
+    body.celular .dock { flex-direction: row; align-items: center; max-height: 100dvh; padding-top: 44px; }
+    body.celular .dock .map { width: 46%; flex: none; }
+    body.celular .panel { flex: 1; }
+    body.celular .rooms button { padding: 9px 8px; font-size: 13px; }
+  }
   /* celular deitado: interface compacta */
   @media (max-height: 520px) {
     .top { padding: 10px 16px; }
@@ -138,7 +173,7 @@
 <!-- Meta Pixel -->
 <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','279593157240250');fbq('track','PageView');</script>
 </head>
-<body>
+<body class="carregando">
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N2VF7FVX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div id="pano"></div>
 
@@ -164,10 +199,10 @@
 </div>
 <button class="reabrir" id="reabrir" type="button">Ambientes</button>
 
-<div class="hint is-hidden" id="hint">Arraste para olhar em volta</div>
+<div class="hint is-hidden" id="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V5.500a1.500 1.500 0 0 1 3 0V11"/><path d="M12 10.500V9a1.500 1.500 0 0 1 3 0v2"/><path d="M15 11v-.500a1.500 1.500 0 0 1 3 0V15a6 6 0 0 1-6 6h-.700a5 5 0 0 1-3.900-1.900L5 15.500a1.600 1.600 0 0 1 2.500-2L9 15"/></svg><span>Arraste para olhar em volta</span></div>
 <div class="rotate" aria-live="polite">
   <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="8" width="24" height="42" rx="4"/><path d="M29 44h6"/><path d="M50 40a18 18 0 0 1-14 16"/><path d="M40 52l-4 4 4 4" /></svg>
-  <strong>Gire o celular</strong>
+  <strong>Gire o celular para ver melhor</strong>
   <span>O tour 360° funciona na horizontal.</span>
 </div>
 
@@ -181,19 +216,25 @@
     { id: 'cozinha', grupo: 'Área social', label: 'Cozinha', x: 0.464, y: 0.271, yaw: -20, links: [{ to: 'living', label: 'Living', yaw: -74, pitch: -19 }, { to: 'suite3', label: 'Suíte 3', yaw: 12, pitch: -8 }] },
     { id: 'terraco', grupo: 'Área social', label: 'Terraço', x: 0.696, y: 0.365, yaw: -60, links: [{ to: 'living', label: 'Living', yaw: -23, pitch: -11 }, { to: 'deck', label: 'Deck e jacuzzi', yaw: -155, pitch: -14 }] },
     { id: 'deck', grupo: 'Área social', label: 'Deck e jacuzzi', x: 0.845, y: 0.494, yaw: -75, links: [{ to: 'terraco', label: 'Terraço', yaw: 25, pitch: -14 }] },
-    { id: 'suite1', grupo: 'Suítes', label: 'Suíte master', x: 0.126, y: 0.45, yaw: -63, links: [{ to: 'banho1', label: 'WC', yaw: 26, pitch: -15 }, { to: 'suite2', label: 'Suíte 2', yaw: 100, pitch: -8 }] },
+    { id: 'suite1', grupo: 'Suítes', label: 'Suíte master', x: 0.126, y: 0.55, yaw: -63, links: [{ to: 'banho1', label: 'WC', yaw: 26, pitch: -15 }, { to: 'suite2', label: 'Suíte 2', yaw: 100, pitch: -8 }] },
     { id: 'banho1', grupo: 'Suítes', wc: true, label: 'WC master', x: 0.086, y: 0.356, yaw: -42, links: [{ to: 'suite1', label: 'Suíte master', yaw: -90, pitch: -25 }] },
-    { id: 'suite2', grupo: 'Suítes', label: 'Suíte 2', x: 0.193, y: 0.462, yaw: -115, links: [{ to: 'banho2', label: 'WC', yaw: 110, pitch: -24 }, { to: 'suite1', label: 'Suíte master', yaw: 92, pitch: -6 }, { to: 'suite3', label: 'Suíte 3', yaw: 74, pitch: -24 }] },
+    { id: 'suite2', grupo: 'Suítes', label: 'Suíte 2', x: 0.193, y: 0.55, yaw: -115, links: [{ to: 'banho2', label: 'WC', yaw: 110, pitch: -24 }, { to: 'suite1', label: 'Suíte master', yaw: 92, pitch: -6 }, { to: 'suite3', label: 'Suíte 3', yaw: 74, pitch: -24 }] },
     { id: 'banho2', grupo: 'Suítes', wc: true, label: 'WC suíte 2', x: 0.237, y: 0.356, yaw: -138, links: [{ to: 'suite2', label: 'Suíte 2', yaw: 12, pitch: -25 }] },
-    { id: 'suite3', grupo: 'Suítes', label: 'Suíte 3', x: 0.295, y: 0.453, yaw: -115, links: [{ to: 'banho3', label: 'WC', yaw: 108, pitch: -22 }, { to: 'suite2', label: 'Suíte 2', yaw: 84, pitch: -10 }] },
+    { id: 'suite3', grupo: 'Suítes', label: 'Suíte 3', x: 0.295, y: 0.55, yaw: -115, links: [{ to: 'banho3', label: 'WC', yaw: 108, pitch: -22 }, { to: 'suite2', label: 'Suíte 2', yaw: 84, pitch: -10 }] },
     { id: 'banho3', grupo: 'Suítes', wc: true, label: 'WC suíte 3', x: 0.334, y: 0.356, yaw: -138, links: [{ to: 'suite3', label: 'Suíte 3', yaw: 13, pitch: -25 }] }
   ];
-  function src(id) { return 'img/' + id + '.webp?v=20261007d'; }
+  // Campo de visão: mais fechado com a tela em pé (estreita). Decidido antes de carregar, para a imagem não
+  // "dar zoom sozinha" depois; só muda se a pessoa girar o aparelho.
+  function emPe() { return window.innerHeight > window.innerWidth; }
+  function campoAlvo() { return emPe() ? 75 : 110; }
+  // no celular vão imagens menores (2560 px, ~4x mais leves); no computador, as de 4096 px
+  var LEVE = window.matchMedia('(pointer: coarse) and (max-width: 950px), (pointer: coarse) and (max-height: 520px)').matches;
+  function src(id) { return 'img/' + (LEVE ? 'm/' : '') + id + '.webp?v=20261008a'; }
 
   var scenes = {};
   ROOMS.forEach(function (r) {
     scenes[r.id] = {
-      title: r.label, type: 'equirectangular', panorama: src(r.id), yaw: r.yaw, pitch: -4, hfov: 105,
+      title: r.label, type: 'equirectangular', panorama: src(r.id), yaw: r.yaw, pitch: -4, hfov: campoAlvo(),
       hotSpots: r.links.map(function (l) {
         return { pitch: l.pitch, yaw: l.yaw, type: 'scene', sceneId: l.to, cssClass: 'hs-go',
                  createTooltipFunc: function (div) { var p = document.createElement('div'); p.className = 'hs-pill'; p.appendChild(document.createElement('i')); var s = document.createElement('span'); s.textContent = l.label; p.appendChild(s); div.appendChild(p); } };
@@ -201,11 +242,27 @@
     };
   });
   var viewer = pannellum.viewer('pano', {
-    default: { firstScene: 'living', strings: { loadingLabel: 'Carregando' }, sceneFadeDuration: 900, autoRotate: -2, autoRotateInactivityDelay: 8000, autoLoad: true, showControls: true, compass: false, minHfov: 50, maxHfov: 115, mouseZoom: true, keyboardZoom: true },
+    default: { firstScene: 'living', strings: { loadingLabel: 'Carregando' }, sceneFadeDuration: 900, autoRotate: -2, autoRotateInactivityDelay: 8000, friction: 0.08, autoLoad: true, showControls: true, compass: false, minHfov: 50, maxHfov: 115, mouseZoom: true, keyboardZoom: true },
     scenes: scenes
   });
 
   window.tourViewer = viewer;
+  // Ao soltar depois de arrastar, a imagem desliza um pouco (friction) e segue girando devagar para o MESMO lado.
+  (function () {
+    var pano = document.getElementById('pano'), y0 = null, timer = null;
+    pano.addEventListener('pointerdown', function () { y0 = viewer.getYaw(); clearTimeout(timer); });
+    document.addEventListener('pointerup', function () {
+      if (y0 === null) return;
+      var d = ((viewer.getYaw() - y0 + 540) % 360) - 180; y0 = null;
+      if (Math.abs(d) < 3) return;                                  // foi um toque, não um arrasto
+      var sinal = d > 0 ? -1 : 1;
+      // segue a 6°/s logo depois do deslize e, passados 6 s, volta ao giro calmo de 2°/s (no mesmo sentido)
+      timer = setTimeout(function () {
+        viewer.startAutoRotate(6 * sinal);
+        timer = setTimeout(function () { viewer.startAutoRotate(2 * sinal); }, 6000);
+      }, 600);
+    });
+  })();
   var rooms = document.getElementById('rooms'), map = document.getElementById('map');
   var grupo = null;
   ROOMS.forEach(function (r) {
@@ -237,6 +294,25 @@
     if (b) rooms.scrollTo({ left: b.offsetLeft - rooms.offsetLeft - (rooms.clientWidth - b.offsetWidth) / 2 });
   });
   setTimeout(setas, 60); setTimeout(setas, 800);
+  // No celular a barra começa recolhida (fica só o botão "Ambientes"), para a imagem ocupar a tela.
+  var celular = window.matchMedia('(pointer: coarse) and (max-width: 950px), (pointer: coarse) and (max-height: 520px)').matches;
+  if (celular) {
+    document.body.classList.add('celular', 'dock-closed');
+    // escolher um ambiente (na lista ou na planta) fecha o painel
+    document.querySelector('.dock').addEventListener('click', function (e) {
+      if (e.target.closest('.rooms button, .map .pt')) document.body.classList.add('dock-closed');
+    });
+  }
+  // No iPhone o navegador não permite tela cheia em páginas: o botão sai.
+  if (!(document.fullscreenEnabled || document.webkitFullscreenEnabled)) document.body.classList.add('sem-tela-cheia');
+  // Em pé a tela é estreita: campo de visão menor, senão a imagem distorce.
+  var orient = emPe();
+  window.addEventListener('resize', function () {      // a barra do Safari também dispara 'resize': só agir se girou
+    if (emPe() === orient) return; orient = emPe(); viewer.setHfov(campoAlvo(), false);
+  });
+  viewer.on('scenechange', function () { viewer.setHfov(campoAlvo(), false); });
+  var giro = document.querySelector('.rotate');
+  if (giro) { giro.innerHTML = '<strong>A experiência é ainda melhor no computador</strong>'; giro.classList.add('is-hidden'); setTimeout(function () { giro.classList.remove('is-hidden'); }, 5200); setTimeout(function () { giro.classList.add('is-hidden'); }, 10500); }
   document.getElementById('fechar').addEventListener('click', function () { document.body.classList.add('dock-closed'); });
   document.getElementById('reabrir').addEventListener('click', function () { document.body.classList.remove('dock-closed'); setTimeout(setas, 60); });
 
@@ -256,12 +332,19 @@
   });
   var hint = document.getElementById('hint');
   ['mousedown', 'touchstart', 'keydown'].forEach(function (ev) { document.addEventListener(ev, function () { hint.classList.add('is-hidden'); }, { once: true }); });
-  // o aviso só aparece depois que o primeiro ambiente carregou (antes ficava por cima do carregamento)
+  // Depois que o primeiro ambiente carrega: libera o menu e mostra a dica de gesto, movendo o ambiente uma vez
+  // para os lados (como se um dedo arrastasse). Qualquer toque cancela.
   var avisou = false, tocou = false;
   ['mousedown', 'touchstart', 'keydown'].forEach(function (ev) { document.addEventListener(ev, function () { tocou = true; }, { once: true }); });
   viewer.on('load', function () {
+    document.body.classList.remove('carregando');
     if (avisou || tocou) return; avisou = true;
-    hint.classList.remove('is-hidden'); setTimeout(function () { hint.classList.add('is-hidden'); }, 4500);
+    var y0 = viewer.getYaw(), passos = [[y0 + 22, 1300], [y0 - 12, 1700], [y0, 1100]], i = 0;
+    viewer.stopAutoRotate(); hint.classList.remove('is-hidden');
+    (function passo() {
+      if (tocou || i >= passos.length) { hint.classList.add('is-hidden'); if (!tocou) viewer.startAutoRotate(-2); return; }
+      viewer.setYaw(passos[i][0], passos[i][1]); setTimeout(passo, passos[i][1] + 80); i++;
+    })();
   });
 })();
 </script>
