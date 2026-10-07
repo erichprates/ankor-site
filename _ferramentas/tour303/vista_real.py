@@ -30,6 +30,25 @@ VISTAS = {
     # (vista_303_deck.jpg é a mesma vista com mais área para baixo; a anterior, vista_303_aberta.png, ia só até ~21° abaixo do horizonte)
     '303_deck': dict(arquivo='vista303/vista_303_deck.jpg', saida='vista303/paisagem_360_real_deck.png',
                      hfov=187.0, yaw=-97.4, horizonte=0.59, base='303', emenda=-43.0),
+    # vista das janelas dos quartos da 303 (foto comum, de frente para a fachada: morro da antena, parque e o rio à esquerda);
+    # posicionada pela antena, que na panorâmica do terraço fica a ~-92°
+    '303_quartos': dict(arquivo='vista303/janelas-303.png', saida='vista303/paisagem_360_real_quartos.png', reta=True,
+                        hfov=85.0, yaw=-100.0, horizonte=0.68, base='303', emenda=-136.0, lado='direita', fim=-78.0, faixa=16.0),
+    # --- 304 (fotos de 07/10/2026). Do terraço da 304 vê-se o parque à esquerda, a cidade e a serra à frente e o mar à
+    # direita (lado da fachada da 304). Ângulos estimados pelo prédio branco de três andares e depois girados 15° para a
+    # direita a pedido do cliente (07/10/2026). Calibração final: a foto das janelas dos quartos é uma foto reta tirada de
+    # frente para a fachada (o telheiro dos barcos sai horizontal), então o centro dela é yaw 90; os dois prédios altos ao
+    # fundo, que estão longe e não sofrem paralaxe, fixam as panorâmicas do terraço (65) e do deck (91). A casa amarela, que
+    # está perto, aparece em direções diferentes dos quartos (~84) e do terraço (~102): por isso living e cozinha, que
+    # olham pela mesma fachada dos quartos, usam a paisagem dos quartos.
+    '304': dict(arquivo='vista304/vista-304.png', saida='vista304/paisagem_360_real.png',
+                hfov=190.0, yaw=65.0, horizonte=0.572),
+    # vista do deck (mais virada para o mar): entra à DIREITA da emenda, até 'fim'; o resto vem da '304'
+    '304_deck': dict(arquivo='vista304/vista2-304.png', saida='vista304/paisagem_360_real_deck.png',
+                     hfov=190.0, yaw=91.0, horizonte=0.49, base='304', emenda=45.0, lado='direita', fim=175.0),
+    # vista das janelas dos quartos da 304 (foto comum, de frente para a fachada): entra só nesse trecho; o resto é a '304'
+    '304_quartos': dict(arquivo='vista304/janelas-304.png', saida='vista304/paisagem_360_real_quartos.png', reta=True,
+                        hfov=75.0, yaw=90.0, horizonte=0.622, base='304', emenda=57.0, lado='direita', fim=110.0, faixa=16.0),
 }
 
 def reflect(i, n):
@@ -44,6 +63,9 @@ def montar(cob, mascara=False, salvar=True):
     w, h = src.size
     a = np.asarray(src).astype(np.float32)
     f = w / np.radians(cfg['hfov'])            # px por radiano (cilíndrica)
+    RETA = cfg.get('reta', False)              # foto comum (perspectiva reta), não panorâmica
+    if RETA:
+        f = (w / 2) / np.tan(np.radians(cfg['hfov'] / 2))
     yh = cfg['horizonte'] * h
 
     lon = ((np.arange(W) + 0.5) / W - 0.5) * 360.0
@@ -61,8 +83,12 @@ def montar(cob, mascara=False, salvar=True):
 
     def amostra(dl):
         px = w / 2 + np.radians(dl) * f                                # (W,)
-        xi = reflect(np.floor(px).astype(np.int64), w)
         PY = np.repeat(py[:, None], W, 1)
+        if RETA:
+            dc = np.radians(np.clip(dl, -80.0, 80.0))
+            px = np.where(np.abs(dl) < 80.0, w / 2 + np.tan(dc) * f, np.sign(dl) * 1e6)
+            PY = yh - (yh - PY) / np.cos(dc)[None, :]
+        xi = reflect(np.floor(px).astype(np.int64), w)
         yi = np.clip(np.where(PY > h - 1, np.full_like(PY, h - 1.0), PY), 0, h - 1)
         out = a[yi.astype(np.int64), xi[None, :]]
         # abaixo da foto: a última linha se dissolve na cor da base, bem desfocada e mais escura (sem espelhar)
@@ -100,6 +126,15 @@ def montar(cob, mascara=False, salvar=True):
         d = (lon - cfg['emenda'] + 180.0) % 360.0 - 180.0             # >0 = à direita da emenda
         larg = np.interp(lat, [1.0, 12.0], [6.0, 70.0])[:, None]      # emenda estreita no chão (sem fantasma), bem larga no céu
         g = np.clip(d[None, :] / larg + 0.5, 0, 1)
+        if cfg.get('lado') == 'direita':                               # esta foto fica entre a emenda e 'fim'
+            fim = (lon - cfg['fim'] + 180.0) % 360.0 - 180.0
+            w = g * np.clip(0.5 - fim / 30.0, 0, 1)[None, :]
+            if cfg.get('faixa'):                                        # só a faixa da paisagem: céu e chão vêm da base
+                lb = -np.degrees(np.arctan((h - yh) / f))
+                w = w * (np.clip((lat - (lb + 1.0)) / 3.0, 0, 1) * np.clip((cfg['faixa'] - lat) / 8.0, 0, 1))[:, None]
+            out = out * w[..., None] + base * (1 - w[..., None])
+            cfg = dict(cfg, base=None)
+    if cfg.get('base'):
         op = (lon - (cfg['emenda'] + 168.0) + 180.0) % 360.0 - 180.0   # segunda emenda, do lado oposto (atrás do prédio)
         g = np.where(np.abs(op)[None, :] < 90, np.clip(0.5 - op / 30.0, 0, 1)[None, :], g)[..., None]
         out = out * (1 - g) + base * g

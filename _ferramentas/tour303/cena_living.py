@@ -1000,10 +1000,11 @@ SHOTS = {
     # O ponto fica entre a jacuzzi e as espreguiçadeiras, a ~1,9 m do guarda-corpo lateral: mais perto que isso a câmera
     # enxerga, pelo vidro, abaixo de onde as fotos da vista terminam (~35° abaixo do horizonte).
     'deck_360':    dict(loc=(12.15, 1.78, 1.6), rot=(90, 0, 90), pano=True, exposure=-0.6, mundo='paisagem_360_real_deck.png'),
-    'suite1_360':  dict(loc=(-6.85, 3.25, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5),
-    'suite2_360':  dict(loc=(-4.9, 3.05, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5),
-    'suite3_360':  dict(loc=(-1.95, 3.2, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5),
-    'banho1_360':  dict(loc=(-8.0, 4.75, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5),
+    # quartos: se existir a vista própria das janelas (vista_real.py 30X_quartos), ela é o mundo; senão vale a geral
+    'suite1_360':  dict(loc=(-6.85, 3.25, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5, mundo='paisagem_360_real_quartos.png'),
+    'suite2_360':  dict(loc=(-4.9, 3.05, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5, mundo='paisagem_360_real_quartos.png'),
+    'suite3_360':  dict(loc=(-1.95, 3.2, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5, mundo='paisagem_360_real_quartos.png'),
+    'banho1_360':  dict(loc=(-8.0, 4.75, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5, mundo='paisagem_360_real_quartos.png'),
     'banho2_360':  dict(loc=(-3.65, 4.75, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5),
     'banho3_360':  dict(loc=(-0.85, 4.75, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5),
     # perspectivas (para refinamento na Higgsfield e comparação)
@@ -1011,6 +1012,8 @@ SHOTS = {
     'cozinha_persp': dict(loc=(0.9, 5.6, 1.4), rot=(80, 0, -145), lens=17),
 }
 if APTO == '304':      # terraço e deck da 304 têm outra planta: pontos próprios (afastados dos guarda-corpos)
+    for k_ in ('living_360', 'cozinha_360'):      # mesma fachada dos quartos: mesma paisagem (ver vista_real.py)
+        SHOTS[k_]['mundo'] = 'paisagem_360_real_quartos.png'
     SHOTS['terraco_360']['loc'] = (9.6, 4.6, 1.6)
     SHOTS['deck_360']['loc'] = (13.9, 2.55, 1.6)
 for name, s in SHOTS.items():

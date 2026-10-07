@@ -295,9 +295,12 @@ dois banhos azuis e um verde). Terraço próprio da 304 pela planta: deck começ
 (17,1 → 15,9 m, medido pela imagem), lareira com 4 poltronas escuras e sofá, 2 chaises no fundo, jacuzzi no canto da fachada.
 **Decisão do cliente (07/10/2026):** forro de madeira do living e piso de madeira das suítes ficam como decoração nas duas
 coberturas, embora nas fotos reais o forro seja branco e o piso das suítes seja porcelanato cinza.
-**Pendente na 304:** (1) vista real — sem `_originais/vista304/paisagem_360_real.png` o render usa a vista da 303 espelhada,
-que **não é a vista da 304**; criar a entrada `'304'` em `VISTAS` no `vista_real.py`; (2) degraus do deck e living com
-mesa de jantar oval, como na planta; móveis das referências (cama em plataforma, pendente de palha, oliveira em vaso);
+**Vistas reais (07/10/2026):** `_originais/vista304/vista-304.png` (terraço), `vista2-304.png` (deck) e `janelas-304.png`
+(janelas dos quartos); na 303, `vista303/janelas-303.png`. Entradas `304`, `304_deck`, `304_quartos` e `303_quartos` no
+`vista_real.py` (rodar as três da 304 nessa ordem). A foto das janelas é reta e só entra na faixa da paisagem; quartos e
+WC master usam `paisagem_360_real_quartos.png`, e na 304 também living e cozinha (objetos próximos, como a casa amarela,
+mudam de direção entre a fachada dos quartos e o terraço; a calibração está comentada no script).
+**Pendente na 304:** (1) cliente conferir a direção das vistas; (2) oliveira nas suítes 2 e 3 (sem espaço) e demais móveis das referências ficam para o refinamento;
 (3) conferir a 304 no DWG; (4) conferir no navegador os pontos da planta e os botões entre ambientes.
 
 **Regras aprendidas (valem para a 304):**
