@@ -422,6 +422,15 @@ def plant(x, y, h=1.6, n=14):
         stem_h = z - 0.45
         cyl('haste', x + r * 0.5 * math.cos(a), y + r * 0.5 * math.sin(a), 0.45, 0.45 + stem_h, 0.008, M['leaf'])
 
+def oliveira(x, y, h=1.9):
+    """Árvore fina em vaso (oliveira) das referências da 304: tronco delgado e copa de folhas miúdas."""
+    cyl('vaso_oliveira', x, y, 0, 0.42, 0.2, M['pot'])
+    cyl('tronco_oliveira', x, y, 0.42, h * 0.62, 0.018, M['wood'])
+    for i in range(46):
+        a = random.uniform(0, 2 * math.pi); r = random.uniform(0.02, 0.36); z = random.uniform(h * 0.5, h)
+        lf = sphere('folha_oliveira', x + r * math.cos(a), y + r * math.sin(a), z, 0.06, mat('folha_oliva', srgb('#7d8a63'), 0.6) if i == 0 else bpy.data.materials['folha_oliva'], scale=(1.5, 0.5, 0.2))
+        lf.rotation_euler = (random.uniform(-0.8, 0.8), random.uniform(-0.8, 0.8), a)
+
 # ---- exterior (planta 303): varanda frontal + área gourmet coberta + solarium + deck com jacuzzi
 def prism(name, pts, z0, z1, m):
     """Prisma a partir de polígono em coordenadas de planta (x, y para baixo)."""
@@ -520,18 +529,19 @@ def stone_build(nt, b):
     nt.links.new(nz.outputs['Fac'], bump.inputs['Height']); nt.links.new(bump.outputs['Normal'], b.inputs['Normal'])
 # É o revestimento da DUCHA externa (foto _originais/referencias/303-terraco-ducha-corredor.webp) e tem de aparecer.
 # Sem a ducha modelada, o refinamento por IA transformava o painel numa "porta": por isso o braço, a ducha e os registros.
-box('painel_ducha', 11.0 + DKX, 12.2 + DKX, BOT - 0.012, BOT, 0.0, 2.1, node_mat('pedra_natural', stone_build))
-box('ducha_braco', 11.59 + DKX, 11.61 + DKX, BOT - 0.38, BOT - 0.012, 2.0, 2.02, M['steel'])
-cyl('ducha_descida', 11.6 + DKX, BOT - 0.37, 1.96, 2.0, 0.01, M['steel'])
-cyl('ducha', 11.6 + DKX, BOT - 0.37, 1.94, 1.96, 0.1, M['steel'])
-for xr in (11.48 + DKX, 11.72 + DKX):
+DUX = DKX if APTO == '303' else 0.2      # 304: ducha no trecho do solarium; o canto do deck tem os degraus
+box('painel_ducha', 11.0 + DUX, 12.2 + DUX, BOT - 0.012, BOT, 0.0, 2.1, node_mat('pedra_natural', stone_build))
+box('ducha_braco', 11.59 + DUX, 11.61 + DUX, BOT - 0.38, BOT - 0.012, 2.0, 2.02, M['steel'])
+cyl('ducha_descida', 11.6 + DUX, BOT - 0.37, 1.96, 2.0, 0.01, M['steel'])
+cyl('ducha', 11.6 + DUX, BOT - 0.37, 1.94, 1.96, 0.1, M['steel'])
+for xr in (11.48 + DUX, 11.72 + DUX):
     box('ducha_registro', xr - 0.03, xr + 0.03, BOT - 0.045, BOT - 0.012, 1.1, 1.16, M['steel'], bevel=0.008)
-box('ducha_ralo', 11.4 + DKX, 11.8 + DKX, BOT - 0.55, BOT - 0.45, 0.0, 0.003, M['steel'])
+box('ducha_ralo', 11.4 + DUX, 11.8 + DUX, BOT - 0.55, BOT - 0.45, 0.0, 0.003, M['steel'])
 # jardineira no fim do deck
 # (começa depois do painel da ducha, que vai até x = 12,2, para não ficar na frente dela)
-box('jardineira', 12.4 + DKX, edge_x(8.4) - 0.05, 8.4, 8.95, 0, 0.45, M['white'])
-for k in range(13 if APTO == '303' else 11):
-    sphere('arbusto', 12.55 + DKX + k * 0.17, 8.68, 0.5, 0.18, M['leaf'], scale=(1, 1, 0.7))
+box('jardineira', 12.4 + (DKX if APTO == '303' else 1.1), edge_x(8.4) - 0.05, 8.4, 8.95, 0, 0.45, M['white'])
+for k in range(13):
+    sphere('arbusto', 12.55 + (DKX if APTO == '303' else 1.1) + k * 0.17, 8.68, 0.5, 0.18, M['leaf'], scale=(1, 1, 0.7))
 
 # --- área gourmet coberta: mesa de 10 lugares + bancada em L com cuba e churrasqueira
 GX0, GX1, GY0, GY1 = 6.05, 7.05, 0.95, 3.6
@@ -621,6 +631,9 @@ else:
         box('espreg_enc', 13.1, 13.6, y0, y0 + 0.72, 0.34, 0.72, M['outdoor'], bevel=0.03)
         box('espreg_base', 13.15, 14.95, y0 + 0.04, y0 + 0.68, 0, 0.18, M['wood'])
     cyl('mesinha_deck', 13.3, 5.45, 0, 0.45, 0.2, M['wood'])
+    # degraus de madeira no canto do deck junto ao muro dos fundos (planta: "deck de madeira elevado")
+    for i in range(3):
+        box('degrau_deck', 12.5, 13.35, 7.5 + i * 0.5, 8.4, 0.15 * i, 0.15 * (i + 1), M['deck'])
 
 # fundos com fotos reais da vista da 303 (sem IA)
 def backdrop(name, path, center, size, rot_z, crop=None, strength=1.0):
@@ -724,16 +737,20 @@ shade = bpy.context.active_object; shade.name = 'luminaria_cupula'
 sol = shade.modifiers.new('espessura', 'SOLIDIFY'); sol.thickness = 0.004
 shade.data.materials.append(M['black']); bpy.ops.object.shade_smooth()
 
-plant(4.35, 0.45)
+if APTO == '303':
+    plant(4.35, 0.45)
+else:
+    oliveira(4.35, 0.45, h=2.0)
 plant(0.45, 4.5, h=1.3, n=10)
 
 # ================================================================== JANTAR
 TX, TY = 2.09, 5.17
 bpy.ops.mesh.primitive_cylinder_add(vertices=96, radius=1.0, depth=0.05, location=(TX, -TY, 0.75))
 tt = bpy.context.active_object; tt.name = 'mesa_jantar'; tt.scale = (1.1, 0.52, 1)
-tt.data.materials.append(M['wood_dark']); bpy.ops.object.shade_smooth()
+M_MESA = M['wood_dark'] if APTO == '303' else mat('tampo_escuro', srgb('#2f2d2a'), 0.35)   # 304: mesa oval escura (planta)
+tt.data.materials.append(M_MESA); bpy.ops.object.shade_smooth()
 for dx in (-0.55, 0.55):
-    box('pe_jantar', TX + dx - 0.06, TX + dx + 0.06, TY - 0.2, TY + 0.2, 0, 0.73, M['wood_dark'])
+    box('pe_jantar', TX + dx - 0.06, TX + dx + 0.06, TY - 0.2, TY + 0.2, 0, 0.73, M_MESA)
 for i in range(3):
     for side in (-1, 1):
         cx = TX - 0.62 + i * 0.62
@@ -754,7 +771,11 @@ for k in range(6):
     sphere('folha_centro', TX + random.uniform(-0.12, 0.12), TY + random.uniform(-0.12, 0.12), 0.86, 0.08, M['leaf'], scale=(1.5, 0.6, 0.15))
 
 # pendente de madeira ripada sobre o jantar (referência)
-sphere('pendente_jantar', TX, TY, 2.05, 0.3, M['wood'], scale=(1, 1, 0.75))
+if APTO == '303':
+    sphere('pendente_jantar', TX, TY, 2.05, 0.3, M['wood'], scale=(1, 1, 0.75))
+else:      # 304: pendente de palha em três camadas (referência)
+    for i, (r, z) in enumerate(((0.2, 2.2), (0.3, 2.06), (0.24, 1.93))):
+        cyl('pendente_palha', TX, TY, z - 0.07, z + 0.07, r, M['cane'])
 cyl('fio_pendente', TX, TY, 2.25, H, 0.004, M['black'])
 
 # ================================================================== COZINHA

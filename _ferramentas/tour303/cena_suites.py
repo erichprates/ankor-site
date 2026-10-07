@@ -88,7 +88,10 @@ def cama(xc, yc, lado, manta, larg=1.6, comp=2.0, pendente=False):
     """Cama de casal com a cabeceira na parede do lado `lado` (+1 = parede da direita/x maior)."""
     xh = xc + lado * comp / 2                       # x da cabeceira
     xa, xb = sorted((xh, xh - lado * comp))
-    box('cama_base', xa + 0.03, xb - 0.03, yc - larg / 2, yc + larg / 2, 0.08, 0.3, M['wood'])
+    if APTO == '303':
+        box('cama_base', xa + 0.03, xb - 0.03, yc - larg / 2, yc + larg / 2, 0.08, 0.3, M['wood'])
+    else:      # 304: cama em plataforma baixa de madeira clara, mais larga que o colchão (referência)
+        box('cama_plataforma', xa - 0.22 if lado > 0 else xa, xb if lado > 0 else xb + 0.22, yc - larg / 2 - 0.2, yc + larg / 2 + 0.2, 0.06, 0.3, M['wood'])
     box('colchao', xa, xb, yc - larg / 2 + 0.02, yc + larg / 2 - 0.02, 0.3, 0.55, M['roupa_cama'], bevel=0.05)
     ma, mb = sorted((xh - lado * 0.85, xh - lado * (comp + 0.02)))
     box('manta', ma, mb, yc - larg / 2 - 0.01, yc + larg / 2 + 0.01, 0.36, 0.575, manta, bevel=0.04)
@@ -287,9 +290,10 @@ banho(-4.3, -3.0, +1, 'lado', M['azulejo_verde'])   # igual nas duas coberturas 
 parede_decorada(S2[0], arte('tela_s2', TELA_S2, seed=11.0), COR_S2 if APTO == '303' else M['ceramic'], 'tela_s2')
 armario(S2[0], S2[0] + 0.55, 3.35, 5.1)
 box('bancada_estudo', -4.3, -3.0, 3.35, 3.75, 0.72, 0.76, M['plaster_white'])
-box('cadeira_s2', -3.9, -3.45, 2.85, 3.3, 0.42, 0.47, M['ceramic'], bevel=0.02)
-box('cadeira_s2_enc', -3.9, -3.45, 2.85, 2.9, 0.47, 0.85, M['ceramic'], bevel=0.02)
-for (cx_, cy_) in ((-3.86, 2.89), (-3.49, 2.89), (-3.86, 3.26), (-3.49, 3.26)):
+# (a cadeira fica à esquerda do criado-mudo, que ocupa x -3,5..-3,08 junto à cabeceira; antes os dois se sobrepunham)
+box('cadeira_s2', -4.27, -3.82, 2.85, 3.3, 0.42, 0.47, M['ceramic'], bevel=0.02)
+box('cadeira_s2_enc', -4.27, -3.82, 2.85, 2.9, 0.47, 0.85, M['ceramic'], bevel=0.02)
+for (cx_, cy_) in ((-4.23, 2.89), (-3.86, 2.89), (-4.23, 3.26), (-3.86, 3.26)):
     cyl('cadeira_s2_pe', cx_, cy_, 0, 0.42, 0.012, M['black'])
 box('s2_fundo', S2[0], -4.4, 5.25, 5.35, 0, H, M['wall'])
 box('s2_porta', -5.05, -4.45, 5.23, 5.25, 0, DOOR, M['wood'])
@@ -308,14 +312,26 @@ box('rack_s1', S1[1] - 0.3, S1[1] - 0.04, 1.6, 3.6, 0.3, 0.5, M['wood_dark'])
 box('tv_s1', S1[1] - 0.07, S1[1] - 0.04, 2.0, 3.2, 1.0, 1.7, M['black_glass'])
 cyl('vaso_rack_s1', S1[1] - 0.17, 1.85, 0.5, 0.72, 0.06, M['ceramic'])
 armchair(-6.5, 0.75, +1)
+if APTO == '304':
+    oliveira(-6.2, 1.35, h=1.8)
 # quadros na parede da direita: um de cada lado do painel da TV e outro mais perto da porta de entrada
-def quadro_parede_x(xw, lado, yc, zc, larg, alt, tela):
+def quadro_parede_x(xw, lado, yc, zc, larg, alt, tela, mold=None):
     """Quadro numa parede de x constante; lado = -1 se a face visível olha para x menor."""
     p = lambda d: xw + lado * d
-    for nome, d0, d1, m, folga in (('quadro_moldura', 0.0, 0.025, M['black'], 0.0), ('quadro_passe', 0.025, 0.028, M['plaster_white'], 0.02),
+    for nome, d0, d1, m, folga in (('quadro_moldura', 0.0, 0.025, mold or M['black'], 0.0), ('quadro_passe', 0.025, 0.028, M['plaster_white'], 0.02),
                                    ('quadro_tela', 0.028, 0.031, tela, 0.09)):
         xa, xb = sorted((p(d0), p(d1)))
         box(nome, xa, xb, yc - larg / 2 + folga, yc + larg / 2 - folga, zc - alt / 2 + folga, zc + alt / 2 - folga, m)
+# parede atrás da cama: tela horizontal grande sobre a cabeceira, ladeada por duas arandelas, e prateleira com objetos
+quadro_parede_x(S1[0] + 0.045, +1, 2.0, 1.88, 1.9, 0.8,
+                arte('tela_s1_cama', ('#efe7da', '#d8c7ad', '#b08a4e', '#3a2f28') if APTO == '303' else TELA_MAR, escala=1.1, seed=58.0),
+                mold=M['brass'] if APTO == '303' else M['wood'])
+for ya_ in (0.72, 3.28):
+    box('arandela_base', S1[0] + 0.045, S1[0] + 0.06, ya_ - 0.04, ya_ + 0.04, 1.7, 2.0, M['brass'])
+    cyl('arandela_luz', S1[0] + 0.1, ya_, 1.78, 1.94, 0.035, M['abajur'])
+    luz(S1[0] + 0.2, ya_, 1.86, 2.0)
+if APTO == '304':      # 304: cabeceira em palha natural, como nas referências
+    box('cabeceira_palha', S1[0] + 0.08, S1[0] + 0.095, 0.62, 3.38, 0.32, 1.23, M['cane'])
 quadro_parede_x(S1[1], -1, 0.9, 1.6, 0.6, 0.85, arte('tela_s1c', ('#efe7da', '#c9b79c', '#7d6a55', '#2f3b3a') if APTO == '303' else TELA_MAR, seed=47.0))
 quadro_parede_x(S1[1], -1, 4.3, 1.55, 0.6, 0.85, arte('tela_s1a', ('#efe7da', '#cdb89a', '#9a7b5a', '#3a2f28') if APTO == '303' else TELA_PRAIA, seed=21.0))
 quadro_parede_x(S1[1], -1, 5.25, 1.55, 0.6, 0.85, arte('tela_s1b', ('#efe7da', '#d8c7ad', '#b08a4e', '#5a4636') if APTO == '303' else TELA_MAR, seed=34.0))
