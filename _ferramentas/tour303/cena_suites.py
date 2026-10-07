@@ -36,6 +36,8 @@ def placa(nome, c1, c2, rejunte, larg, alt, eixo='xy', rough=0.45, junta=0.004, 
         nt.links.new(bump.outputs['Normal'], b.inputs['Normal'])
     return node_mat(nome, build)
 PORC = ('#cdc9c1', '#c8c4bc', '#b3afa7')
+if APTO == '304':      # 304 (fotos assets/img/coberturas/304-banho*.webp): porcelanato marmorizado claro, com veios bege
+    PORC = ('#e6e1d8', '#e1dbd0', '#cfc8bb')
 M['banho_piso'] = placa('porcelanato_banho_piso', *PORC, 0.9, 0.9, 'xy')
 M['banho_par_xz'] = placa('porcelanato_banho_parede_xz', *PORC, 1.2, 1.2, 'xz')
 M['banho_par_yz'] = placa('porcelanato_banho_parede_yz', *PORC, 1.2, 1.2, 'yz')
@@ -55,8 +57,20 @@ M['espelho'] = mat('espelho', (0.9, 0.9, 0.9), 0.02, 1.0)
 M['roupa_cama'] = node_mat('roupa_cama', velvet('#ebe6dc'))
 M['cabeceira'] = node_mat('cabeceira', velvet('#b9ad9b'))
 M['tapete'] = node_mat('tapete_suite', velvet('#d8d4cc'))
+M['parede_areia'] = mat('parede_areia', srgb('#d9c8b0'), 0.9)
 M['abajur'] = mat('abajur', (1, 1, 1), 0.5, **{'Emission Color': (1.0, 0.8, 0.58, 1), 'Emission Strength': 4.0})
 M['led_branco'] = mat('led_suite', (1, 1, 1), 0.5, **{'Emission Color': (1.0, 0.82, 0.62, 1), 'Emission Strength': 8.0})
+
+# cores por cobertura, conforme as plantas humanizadas (manta da cama e paleta do quadro de cada suíte)
+TELA_AZUL = ('#e9dfcf', '#c9a27a', '#8a5a3c', '#1b2a44'); TELA_VERDE = ('#ece4d6', '#b9c2a8', '#5f7d6e', '#2e5d57')
+TELA_AREIA = ('#efe7da', '#cdb89a', '#9a7b5a', '#3a2f28')
+TELA_MAR = ('#ece7dc', '#cfd9dc', '#8fb3c6', '#3f6f8f'); TELA_PRAIA = ('#efe9dd', '#dccdb4', '#a9c0c9', '#6f93a8')
+if APTO == '304':      # 304 (referências de decoração): roupa de cama em linho, com azul-claro, areia e verde-sálvia
+    M['azul_claro'] = node_mat('linho_azul_claro', velvet('#a9c6d6')); M['salvia'] = node_mat('linho_salvia', velvet('#a8b5a0'))
+    COR_S1, COR_S2, COR_S3 = M['azul_claro'], M['linen'], M['salvia']; TELA_S2, TELA_S3 = TELA_PRAIA, TELA_MAR
+    TELA_AREIA = TELA_MAR
+else:                  # 303: master em tons de areia, suíte 2 verde, suíte 3 azul
+    COR_S1, COR_S2, COR_S3 = M['linen'], M['ceramic'], M['navy']; TELA_S2, TELA_S3 = TELA_VERDE, TELA_AZUL
 
 BATH_Y0, BATH_Y1 = 3.85, 6.13      # banho: 1,30 m de largura; fundo alinhado à parede do hall
 DOOR = 2.10                        # portas internas 2,10 m (DWG)
@@ -225,18 +239,25 @@ def arte(nome, cores, escala=1.6, seed=0.0):
         b.inputs['Roughness'].default_value = 0.85
     return node_mat(nome, build)
 
-def parede_decorada(a, tela, objeto):
+def parede_decorada(a, tela, objeto, nome_tela='tela'):
     """Parede em frente à cama (a que fica diante da câmera): painel ripado iluminado, aparador de madeira suspenso
     com objetos e um quadro grande."""
-    box('ripado_parede', a + 0.001, a + 0.03, 0.2, 3.3, 0, 2.5, M['slat'])
+    # 303: painel ripado; 304: parede lisa em tom de areia (como nas referências)
+    box('ripado_parede', a + 0.001, a + 0.03, 0.2, 3.3, 0, 2.5, M['slat'] if APTO == '303' else M['parede_areia'])
     box('sanca_led_parede', a + 0.001, a + 0.045, 0.2, 3.3, 2.5, 2.52, M['led_branco'])
     box('aparador', a + 0.03, a + 0.4, 0.5, 2.9, 0.4, 0.72, M['wood'], bevel=0.004)
     box('aparador_tampo', a + 0.03, a + 0.41, 0.49, 2.91, 0.72, 0.745, M['marble'])
     # quadro grande com moldura fina preta e passe-partout claro
-    yq0, yq1, zq0, zq1 = 0.95, 2.45, 1.02, 2.12
-    box('quadro_moldura', a + 0.03, a + 0.055, yq0, yq1, zq0, zq1, M['black'])
-    box('quadro_passe', a + 0.055, a + 0.058, yq0 + 0.025, yq1 - 0.025, zq0 + 0.025, zq1 - 0.025, M['plaster_white'])
-    box('quadro_tela', a + 0.058, a + 0.061, yq0 + 0.13, yq1 - 0.13, zq0 + 0.13, zq1 - 0.13, tela)
+    if APTO == '303':      # um quadro grande, moldura preta fina e passe-partout claro
+        quadros = [(0.95, 2.45, tela)]; mold = M['black']
+    else:                  # 304: par de marinhas com moldura de madeira
+        quadros = [(0.72, 1.6, tela), (1.8, 2.68, arte(nome_tela + '_b', TELA_PRAIA, seed=77.0))]; mold = M['wood']
+    zq0, zq1 = 1.02, 2.12
+    for yq0, yq1, tl in quadros:
+        box('quadro_moldura', a + 0.03, a + 0.055, yq0, yq1, zq0, zq1, mold)
+        box('quadro_passe', a + 0.055, a + 0.058, yq0 + 0.025, yq1 - 0.025, zq0 + 0.025, zq1 - 0.025, M['plaster_white'])
+        m_ = 0.13 if APTO == '303' else 0.03
+        box('quadro_tela', a + 0.058, a + 0.061, yq0 + m_, yq1 - m_, zq0 + m_, zq1 - m_, tl)
     # objetos sobre o aparador
     cyl('vaso_aparador', a + 0.22, 0.75, 0.745, 1.02, 0.07, objeto)
     sphere('vaso_aparador_boca', a + 0.22, 0.75, 1.02, 0.075, objeto, scale=(1, 1, 0.5))
@@ -253,17 +274,17 @@ box('div_s2_s1', -5.95, -5.75, -WT, 6.5, 0, H, M['wall'])
 box('empena', -8.8, -8.65, -WT, 6.5, 0, H, M['wall'])
 
 # ---- suíte 3 (ao lado do living): 2,70 x 5,40, cabeceira na parede do living
-suite(*S3, 5.40, +1, M['navy'], 1.75)
-banho(-1.45, -0.15, +1, 'lado', M['azulejo_verde'])
-parede_decorada(S3[0], arte('tela_s3', ('#e9dfcf', '#c9a27a', '#8a5a3c', '#1b2a44'), seed=3.0), M['navy'])
+suite(*S3, 5.40, +1, COR_S3, 1.75)
+banho(-1.45, -0.15, +1, 'lado', M['azulejo_verde'])                                   # suíte 3: verde nas duas coberturas
+parede_decorada(S3[0], arte('tela_s3', TELA_S3, seed=3.0), COR_S3, 'tela_s3')
 armario(S3[0], S3[0] + 0.55, 3.35, 5.25)
 box('s3_fundo', S3[0], -1.55, 5.40, 5.50, 0, H, M['wall'])                    # fundo com a porta de entrada (fechada)
 box('s3_porta', -2.2, -1.6, 5.38, 5.40, 0, DOOR, M['wood'])
 
 # ---- suíte 2 (meio): 2,75 x 5,25, cabeceira na parede da direita, bancada de estudo sobre o banho
-suite(*S2, 5.25, +1, M['ceramic'], 1.7)
-banho(-4.3, -3.0, +1, 'lado', M['azulejo_verde'])
-parede_decorada(S2[0], arte('tela_s2', ('#ece4d6', '#b9c2a8', '#5f7d6e', '#2e5d57'), seed=11.0), M['ceramic'])
+suite(*S2, 5.25, +1, COR_S2, 1.7)
+banho(-4.3, -3.0, +1, 'lado', M['azulejo_verde'])   # igual nas duas coberturas (decisão do cliente em 07/10/2026; as fotos da 304 mostram dois banhos azuis)
+parede_decorada(S2[0], arte('tela_s2', TELA_S2, seed=11.0), COR_S2 if APTO == '303' else M['ceramic'], 'tela_s2')
 armario(S2[0], S2[0] + 0.55, 3.35, 5.1)
 box('bancada_estudo', -4.3, -3.0, 3.35, 3.75, 0.72, 0.76, M['plaster_white'])
 box('cadeira_s2', -3.9, -3.45, 2.85, 3.3, 0.42, 0.47, M['ceramic'], bevel=0.02)
@@ -275,12 +296,12 @@ box('s2_porta', -5.05, -4.45, 5.23, 5.25, 0, DOOR, M['wood'])
 
 # ---- suíte 1 (master, ponta): 2,70 x 6,35, cabeceira na empena, banho no fundo à esquerda
 box('suite_piso', S1[0], S1[1], 3.75, 6.35, 0.0, Z0, M['vinilico'])
-suite(*S1, 3.75, -1, M['linen'], 2.0, pendente=True)
+suite(*S1, 3.75, -1, COR_S1, 2.0, pendente=True)
 box('suite_forro_fundo', S1[0], S1[1], BATH_Y1, 6.5, H - 0.03, H - 0.02, M['plaster_white'])
 banho(-8.65, -7.35, -1, 'topo', M['azulejo_azul'])
 # decoração da master (sem bancada, a pedido): painel ripado iluminado atrás da cama, pendentes de latão,
 # painel de TV em madeira escura com rack suspenso e canto de leitura junto à janela
-box('painel_ripado_s1', S1[0] + 0.02, S1[0] + 0.045, 0.2, 3.75, 0, 2.5, M['slat'])
+box('painel_ripado_s1', S1[0] + 0.02, S1[0] + 0.045, 0.2, 3.75, 0, 2.5, M['slat'] if APTO == '303' else M['parede_areia'])
 box('sanca_led_s1', S1[0] + 0.02, S1[0] + 0.06, 0.2, 3.75, 2.5, 2.52, M['led_branco'])
 box('painel_tv_s1', S1[1] - 0.04, S1[1], 1.5, 3.7, 0.0, H - 0.03, M['wood_dark'])
 box('rack_s1', S1[1] - 0.3, S1[1] - 0.04, 1.6, 3.6, 0.3, 0.5, M['wood_dark'])
@@ -295,9 +316,9 @@ def quadro_parede_x(xw, lado, yc, zc, larg, alt, tela):
                                    ('quadro_tela', 0.028, 0.031, tela, 0.09)):
         xa, xb = sorted((p(d0), p(d1)))
         box(nome, xa, xb, yc - larg / 2 + folga, yc + larg / 2 - folga, zc - alt / 2 + folga, zc + alt / 2 - folga, m)
-quadro_parede_x(S1[1], -1, 0.9, 1.6, 0.6, 0.85, arte('tela_s1c', ('#efe7da', '#c9b79c', '#7d6a55', '#2f3b3a'), seed=47.0))
-quadro_parede_x(S1[1], -1, 4.3, 1.55, 0.6, 0.85, arte('tela_s1a', ('#efe7da', '#cdb89a', '#9a7b5a', '#3a2f28'), seed=21.0))
-quadro_parede_x(S1[1], -1, 5.25, 1.55, 0.6, 0.85, arte('tela_s1b', ('#efe7da', '#d8c7ad', '#b08a4e', '#5a4636'), seed=34.0))
+quadro_parede_x(S1[1], -1, 0.9, 1.6, 0.6, 0.85, arte('tela_s1c', ('#efe7da', '#c9b79c', '#7d6a55', '#2f3b3a') if APTO == '303' else TELA_MAR, seed=47.0))
+quadro_parede_x(S1[1], -1, 4.3, 1.55, 0.6, 0.85, arte('tela_s1a', ('#efe7da', '#cdb89a', '#9a7b5a', '#3a2f28') if APTO == '303' else TELA_PRAIA, seed=21.0))
+quadro_parede_x(S1[1], -1, 5.25, 1.55, 0.6, 0.85, arte('tela_s1b', ('#efe7da', '#d8c7ad', '#b08a4e', '#5a4636') if APTO == '303' else TELA_MAR, seed=34.0))
 cyl('mesa_lateral_s1', -7.05, 0.5, 0.0, 0.5, 0.17, M['brass'])
 cyl('luminaria_s1_haste', -6.1, 0.35, 0.0, 1.45, 0.01, M['black'])
 cyl('luminaria_s1_cupula', -6.1, 0.35, 1.45, 1.65, 0.11, M['abajur'])

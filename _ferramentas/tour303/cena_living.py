@@ -23,6 +23,9 @@ SAMPLES = int(arg('--samples', '256'))
 RES = int(arg('--res', '4096'))
 ONLY = [s for s in arg('--only', '').split(',') if s]
 SAVE = arg('--save', '')
+# Cobertura: a 304 é a 303 espelhada (fachada do outro lado do prédio; o terraço das duas aponta para o mesmo lado).
+# O modelo é sempre montado nas coordenadas da 303 e, para a 304, tudo é espelhado no fim (ver "ESPELHO 304").
+APTO = arg('--apto', '303')
 HERE = os.path.dirname(os.path.abspath(__file__))
 ORIG = os.path.abspath(os.path.join(HERE, '..', '..', '_originais'))
 os.makedirs(OUT, exist_ok=True)
@@ -285,6 +288,30 @@ M = dict(
     book=mat('livro', srgb('#e0d4c0'), 0.8),
 )
 
+# ---- 304: decoração "litoral natural" (referências em _originais/referencias/decoracao304/): linho e areia, madeira
+# clara, pedra clara na parede da TV, palha, toques de azul; a 303 fica com a paleta quente (madeira escura, marinho, latão).
+if APTO == '304':
+    def _pedra_clara(nt, b):
+        br = nt.nodes.new('ShaderNodeTexBrick'); br.inputs['Scale'].default_value = 2.2
+        br.inputs['Color1'].default_value = (*srgb('#e4dccf'), 1); br.inputs['Color2'].default_value = (*srgb('#d6ccbc'), 1)
+        br.inputs['Mortar'].default_value = (*srgb('#c2b7a5'), 1); br.inputs['Mortar Size'].default_value = 0.006
+        br.inputs['Brick Width'].default_value = 0.7; br.inputs['Row Height'].default_value = 0.22
+        nt.links.new(tex_coord(nt), br.inputs['Vector'])
+        nt.links.new(br.outputs['Color'], b.inputs['Base Color']); b.inputs['Roughness'].default_value = 0.85
+        bump = nt.nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value = 0.5
+        nt.links.new(br.outputs['Fac'], bump.inputs['Height']); nt.links.new(bump.outputs['Normal'], b.inputs['Normal'])
+    M.update(
+        wood=node_mat('carvalho_claro', wood_build('#c9a57c', '#a98560')),
+        wood_dark=node_mat('carvalho_mel', wood_build('#b88c5f', '#96704a', gloss=0.4)),
+        slat=node_mat('ripado_claro', wood_build('#c49a6c', '#a17c52', scale=(1, 1, 18))),
+        plaster=node_mat('pedra_clara', _pedra_clara),
+        navy=node_mat('linho_areia', velvet('#d9cfbf')),
+        cushion_rust=node_mat('almofada_azul', velvet('#7fa3b8')),
+        ceramic=mat('ceramica_azul', srgb('#6f93a8'), 0.35),
+        lacquer=mat('laca_areia', srgb('#cfc4b2'), 0.35, **{'Coat Weight': 0.3}),
+        brass=mat('madeira_torneada', srgb('#b08a62'), 0.5),
+    )
+
 # ------------------------------------------------------------------ geometria
 def box(name, x0, x1, y0, y1, z0, z1, m, bevel=0.0):
     """Caixa em coordenadas de planta (y para baixo)."""
@@ -420,8 +447,15 @@ M['water'] = mat('agua', srgb('#8fd3dc'), 0.02, **{'Transmission Weight': 0.9, '
 M['outdoor'] = node_mat('tecido_externo', velvet('#c9bfae'))
 M['stone'] = mat('pedra', srgb('#8d8a84'), 0.8)
 
-# borda inclinada do deck: x = 13.6 em y=-1.3 até x = 14.85 em y=9.0
-def edge_x(y): return 13.6 + (y + 1.3) * (1.25 / 10.3)
+# borda inclinada do deck (divisa do terreno). 303: x = 13,6 na fachada até 14,85 no fundo.
+# 304 (planta humanizada, medida pela imagem; confere com os ~11,9 m de terraço do DWG): o terraço é maior e a mesma
+# divisa continua, então ele é mais largo na FACHADA: x = 17,1 na fachada até 15,9 no fundo; o deck começa em x = 12,5.
+if APTO == '304':
+    def edge_x(y): return 17.1 - (y + 1.3) * (1.2 / 10.35)
+    DKX = 1.5          # quanto o início do deck (e o que fica no muro dos fundos) anda em relação à 303
+else:
+    def edge_x(y): return 13.6 + (y + 1.3) * (1.25 / 10.3)
+    DKX = 0.0
 TOP, BOT = -1.3, 9.05
 
 # varanda frontal das suítes/living
@@ -436,10 +470,13 @@ box('fecho_varanda', VAR_X0 - 0.15, VAR_X0, -1.5, 0.0, -0.06, H, M['white'])
 # área gourmet coberta (piso escuro) x 4.75–8.25
 box('piso_gourmet', 4.75, 8.65, TOP, BOT, -0.06, -0.01, M['porc_dark'])
 # solarium descoberto (piso claro) x 8.25–11.0
-box('piso_solarium', 8.65, 11.0, TOP, BOT, -0.06, -0.01, M['porc_light'])
+box('piso_solarium', 8.65, 11.0 + DKX, TOP, BOT, -0.06, -0.01, M['porc_light'])
 # deck de madeira (com recorte da planta em x 11.0–11.75 abaixo de y 3.9)
-prism('deck_madeira', [(11.0, TOP), (edge_x(TOP), TOP), (edge_x(BOT), BOT), (11.75, BOT), (11.75, 3.9), (11.0, 3.9)], -0.06, 0.0, M['deck'])
-prism('solarium_recorte', [(11.0, 3.9), (11.75, 3.9), (11.75, BOT), (11.0, BOT)], -0.06, -0.01, M['porc_light'])
+if APTO == '303':
+    prism('deck_madeira', [(11.0, TOP), (edge_x(TOP), TOP), (edge_x(BOT), BOT), (11.75, BOT), (11.75, 3.9), (11.0, 3.9)], -0.06, 0.0, M['deck'])
+    prism('solarium_recorte', [(11.0, 3.9), (11.75, 3.9), (11.75, BOT), (11.0, BOT)], -0.06, -0.01, M['porc_light'])
+else:
+    prism('deck_madeira', [(12.5, TOP), (edge_x(TOP), TOP), (edge_x(BOT), BOT), (12.5, BOT)], -0.06, 0.0, M['deck'])
 # laje de cobertura da área gourmet (com forro de madeira) e beiral
 box('laje_gourmet', 4.75, 8.75, TOP - 0.2, BOT, H, H + 0.3, M['white'])
 box('forro_gourmet', 4.75, 8.65, TOP, BOT, H - 0.02, H, M['ceiling'])
@@ -483,18 +520,18 @@ def stone_build(nt, b):
     nt.links.new(nz.outputs['Fac'], bump.inputs['Height']); nt.links.new(bump.outputs['Normal'], b.inputs['Normal'])
 # É o revestimento da DUCHA externa (foto _originais/referencias/303-terraco-ducha-corredor.webp) e tem de aparecer.
 # Sem a ducha modelada, o refinamento por IA transformava o painel numa "porta": por isso o braço, a ducha e os registros.
-box('painel_ducha', 11.0, 12.2, BOT - 0.012, BOT, 0.0, 2.1, node_mat('pedra_natural', stone_build))
-box('ducha_braco', 11.59, 11.61, BOT - 0.38, BOT - 0.012, 2.0, 2.02, M['steel'])
-cyl('ducha_descida', 11.6, BOT - 0.37, 1.96, 2.0, 0.01, M['steel'])
-cyl('ducha', 11.6, BOT - 0.37, 1.94, 1.96, 0.1, M['steel'])
-for xr in (11.48, 11.72):
+box('painel_ducha', 11.0 + DKX, 12.2 + DKX, BOT - 0.012, BOT, 0.0, 2.1, node_mat('pedra_natural', stone_build))
+box('ducha_braco', 11.59 + DKX, 11.61 + DKX, BOT - 0.38, BOT - 0.012, 2.0, 2.02, M['steel'])
+cyl('ducha_descida', 11.6 + DKX, BOT - 0.37, 1.96, 2.0, 0.01, M['steel'])
+cyl('ducha', 11.6 + DKX, BOT - 0.37, 1.94, 1.96, 0.1, M['steel'])
+for xr in (11.48 + DKX, 11.72 + DKX):
     box('ducha_registro', xr - 0.03, xr + 0.03, BOT - 0.045, BOT - 0.012, 1.1, 1.16, M['steel'], bevel=0.008)
-box('ducha_ralo', 11.4, 11.8, BOT - 0.55, BOT - 0.45, 0.0, 0.003, M['steel'])
+box('ducha_ralo', 11.4 + DKX, 11.8 + DKX, BOT - 0.55, BOT - 0.45, 0.0, 0.003, M['steel'])
 # jardineira no fim do deck
 # (começa depois do painel da ducha, que vai até x = 12,2, para não ficar na frente dela)
-box('jardineira', 12.4, edge_x(8.4) - 0.05, 8.4, 8.95, 0, 0.45, M['white'])
-for k in range(13):
-    sphere('arbusto', 12.55 + k * 0.17, 8.68, 0.5, 0.18, M['leaf'], scale=(1, 1, 0.7))
+box('jardineira', 12.4 + DKX, edge_x(8.4) - 0.05, 8.4, 8.95, 0, 0.45, M['white'])
+for k in range(13 if APTO == '303' else 11):
+    sphere('arbusto', 12.55 + DKX + k * 0.17, 8.68, 0.5, 0.18, M['leaf'], scale=(1, 1, 0.7))
 
 # --- área gourmet coberta: mesa de 10 lugares + bancada em L com cuba e churrasqueira
 GX0, GX1, GY0, GY1 = 6.05, 7.05, 0.95, 3.6
@@ -532,31 +569,58 @@ for yy in (4.9, 5.55, 6.2, 6.85):
     cyl('banqueta_g_pe', 7.7, yy, 0.0, 0.72, 0.02, M['black'])
 plant(5.4, 8.0, h=1.4, n=10)
 
-# --- solarium: lounge (sofá + 4 poltronas + mesa de centro) e 2 chaises
-box('sofa_ext', 10.2, 10.95, 0.05, 1.95, 0.1, 0.42, M['outdoor'], bevel=0.04)
-box('sofa_ext_enc', 10.75, 10.95, 0.05, 1.95, 0.42, 0.8, M['outdoor'], bevel=0.05)
-for (x, y) in ((9.05, -0.55), (9.8, -0.55), (9.05, 2.4), (9.8, 2.4)):
-    box('poltrona_ext', x - 0.32, x + 0.32, y - 0.32, y + 0.32, 0.1, 0.42, M['outdoor'], bevel=0.04)
-    back = y - 0.3 if y < 1 else y + 0.3
-    box('poltrona_ext_enc', x - 0.32, x + 0.32, back - 0.07, back + 0.07, 0.42, 0.75, M['outdoor'], bevel=0.04)
-box('mesa_centro_ext', 9.2, 9.6, 0.35, 1.3, 0.3, 0.38, M['wood'], bevel=0.01)
-box('mesa_lateral_ext', 10.3, 10.65, 2.2, 2.55, 0, 0.42, M['wood'])
-plant(10.75, -0.75, h=1.1, n=9)
-for y0 in (4.35, 5.55):
-    box('chaise', 9.3, 11.0, y0, y0 + 0.8, 0.12, 0.38, M['outdoor'], bevel=0.04)
-    enc = box('chaise_enc', 10.55, 11.0, y0, y0 + 0.8, 0.38, 0.7, M['outdoor'], bevel=0.04)
-    box('chaise_base', 9.35, 10.95, y0 + 0.05, y0 + 0.75, 0, 0.12, M['wood'])
-cyl('mesinha_chaise', 10.2, 5.3, 0, 0.45, 0.14, M['wood'])
+if APTO == '303':
+    # --- solarium: lounge (sofá + 4 poltronas + mesa de centro) e 2 chaises
+    box('sofa_ext', 10.2, 10.95, 0.05, 1.95, 0.1, 0.42, M['outdoor'], bevel=0.04)
+    box('sofa_ext_enc', 10.75, 10.95, 0.05, 1.95, 0.42, 0.8, M['outdoor'], bevel=0.05)
+    for (x, y) in ((9.05, -0.55), (9.8, -0.55), (9.05, 2.4), (9.8, 2.4)):
+        box('poltrona_ext', x - 0.32, x + 0.32, y - 0.32, y + 0.32, 0.1, 0.42, M['outdoor'], bevel=0.04)
+        back = y - 0.3 if y < 1 else y + 0.3
+        box('poltrona_ext_enc', x - 0.32, x + 0.32, back - 0.07, back + 0.07, 0.42, 0.75, M['outdoor'], bevel=0.04)
+    box('mesa_centro_ext', 9.2, 9.6, 0.35, 1.3, 0.3, 0.38, M['wood'], bevel=0.01)
+    box('mesa_lateral_ext', 10.3, 10.65, 2.2, 2.55, 0, 0.42, M['wood'])
+    plant(10.75, -0.75, h=1.1, n=9)
+    for y0 in (4.35, 5.55):
+        box('chaise', 9.3, 11.0, y0, y0 + 0.8, 0.12, 0.38, M['outdoor'], bevel=0.04)
+        enc = box('chaise_enc', 10.55, 11.0, y0, y0 + 0.8, 0.38, 0.7, M['outdoor'], bevel=0.04)
+        box('chaise_base', 9.35, 10.95, y0 + 0.05, y0 + 0.75, 0, 0.12, M['wood'])
+    cyl('mesinha_chaise', 10.2, 5.3, 0, 0.45, 0.14, M['wood'])
 
-# --- deck: jacuzzi + 3 espreguiçadeiras
-box('jacuzzi_borda', 11.15, 13.05, -0.75, 1.45, 0.0, 0.55, M['white'])
-box('jacuzzi_agua', 11.3, 12.9, -0.6, 1.3, 0.3, 0.553, M['water'])   # lâmina um fio acima da borda maciça, senão não aparece
-for y0 in (2.6, 3.85, 5.25):
-    x0 = 12.2 + (y0 - 2.6) * 0.1
-    box('espreg', x0, x0 + 1.9, y0, y0 + 0.72, 0.18, 0.34, M['navy'], bevel=0.03)
-    box('espreg_enc', x0 + 1.4, x0 + 1.9, y0, y0 + 0.72, 0.34, 0.72, M['navy'], bevel=0.03)
-    box('espreg_base', x0 + 0.05, x0 + 1.85, y0 + 0.04, y0 + 0.68, 0, 0.18, M['steel'])
-cyl('mesinha_deck', 13.35, 4.9, 0, 0.45, 0.2, M['wood'])
+    # --- deck: jacuzzi + 3 espreguiçadeiras
+    box('jacuzzi_borda', 11.15, 13.05, -0.75, 1.45, 0.0, 0.55, M['white'])
+    box('jacuzzi_agua', 11.3, 12.9, -0.6, 1.3, 0.3, 0.553, M['water'])   # lâmina um fio acima da borda maciça, senão não aparece
+    for y0 in (2.6, 3.85, 5.25):
+        x0 = 12.2 + (y0 - 2.6) * 0.1
+        m_esp = M['navy'] if APTO == '303' else M['outdoor']       # planta da 304: espreguiçadeiras claras
+        box('espreg', x0, x0 + 1.9, y0, y0 + 0.72, 0.18, 0.34, m_esp, bevel=0.03)
+        box('espreg_enc', x0 + 1.4, x0 + 1.9, y0, y0 + 0.72, 0.34, 0.72, m_esp, bevel=0.03)
+        box('espreg_base', x0 + 0.05, x0 + 1.85, y0 + 0.04, y0 + 0.68, 0, 0.18, M['steel'])
+    cyl('mesinha_deck', 13.35, 4.9, 0, 0.45, 0.2, M['wood'])
+else:
+    # --- 304 (planta humanizada): lounge com lareira e 4 poltronas escuras + sofá, 2 chaises junto ao muro dos fundos,
+    #     jacuzzi no canto da fachada e 3 espreguiçadeiras claras no deck
+    M['outdoor_escuro'] = node_mat('tecido_externo_escuro', velvet('#4b4a47'))
+    for (x, y) in ((10.2, -0.4), (11.2, -0.4), (10.2, 2.8), (11.2, 2.8)):
+        box('poltrona_ext', x - 0.36, x + 0.36, y - 0.36, y + 0.36, 0.1, 0.42, M['outdoor_escuro'], bevel=0.04)
+        back = y - 0.33 if y < 1 else y + 0.33
+        box('poltrona_ext_enc', x - 0.36, x + 0.36, back - 0.07, back + 0.07, 0.42, 0.75, M['outdoor_escuro'], bevel=0.04)
+    box('lareira', 10.05, 11.35, 0.95, 1.45, 0.0, 0.42, M['stone'], bevel=0.01)
+    box('lareira_fogo', 10.2, 11.2, 1.1, 1.3, 0.42, 0.44, mat('fogo', (1, 1, 1), 0.5, **{'Emission Color': (1.0, 0.45, 0.12, 1), 'Emission Strength': 6.0}))
+    box('sofa_ext', 11.75, 12.45, 0.3, 2.1, 0.1, 0.42, M['outdoor_escuro'], bevel=0.04)
+    box('sofa_ext_enc', 12.27, 12.45, 0.3, 2.1, 0.42, 0.8, M['outdoor_escuro'], bevel=0.05)
+    plant(12.2, -0.6, h=1.0, n=8); plant(12.2, 2.7, h=1.0, n=8)
+    for x0 in (9.05, 10.35):
+        box('chaise', x0, x0 + 0.8, 6.9, 8.7, 0.12, 0.38, M['outdoor_escuro'], bevel=0.04)
+        box('chaise_enc', x0, x0 + 0.8, 8.25, 8.7, 0.38, 0.7, M['outdoor_escuro'], bevel=0.04)
+        box('chaise_base', x0 + 0.05, x0 + 0.75, 6.95, 8.65, 0, 0.12, M['wood'])
+    cyl('mesinha_chaise', 10.1, 7.6, 0, 0.45, 0.12, M['wood'])
+    box('jacuzzi_borda', 13.2, 15.7, -0.4, 1.8, 0.0, 0.55, M['white'])
+    box('jacuzzi_agua', 13.35, 15.55, -0.25, 1.65, 0.3, 0.553, M['water'])
+    for y0 in (3.4, 4.6, 5.8):
+        box('espreg', 13.1, 15.0, y0, y0 + 0.72, 0.18, 0.34, M['outdoor'], bevel=0.03)
+        box('espreg_enc', 13.1, 13.6, y0, y0 + 0.72, 0.34, 0.72, M['outdoor'], bevel=0.03)
+        box('espreg_base', 13.15, 14.95, y0 + 0.04, y0 + 0.68, 0, 0.18, M['wood'])
+    cyl('mesinha_deck', 13.3, 5.45, 0, 0.45, 0.2, M['wood'])
 
 # fundos com fotos reais da vista da 303 (sem IA)
 def backdrop(name, path, center, size, rot_z, crop=None, strength=1.0):
@@ -615,14 +679,15 @@ box('tapete', 0.62, 3.18, 0.6, 3.98, 0.0, 0.012, M['jute'])
 
 # sofá marinho em L (chaise voltada para a janela), costas para o aparador
 SX0, SX1, SY0, SY1 = 2.35, 3.4, 0.9, 3.35
-box('sofa_base', SX0, SX1, SY0, SY1, 0.1, 0.42, M['navy'], bevel=0.04)
-box('sofa_encosto', SX1 - 0.22, SX1, SY0, SY1, 0.42, 0.82, M['navy'], bevel=0.06)
-box('sofa_chaise', 1.75, SX0 + 0.1, SY0, 1.65, 0.1, 0.42, M['navy'], bevel=0.04)
+M_SOFA = M['navy'] if APTO == '303' else M['linen']       # planta da 304: sofá claro e poltronas verdes
+box('sofa_base', SX0, SX1, SY0, SY1, 0.1, 0.42, M_SOFA, bevel=0.04)
+box('sofa_encosto', SX1 - 0.22, SX1, SY0, SY1, 0.42, 0.82, M_SOFA, bevel=0.06)
+box('sofa_chaise', 1.75, SX0 + 0.1, SY0, 1.65, 0.1, 0.42, M_SOFA, bevel=0.04)
 for y0, y1 in ((SY0, SY0 + 0.2), (SY1 - 0.2, SY1)):
-    box('sofa_braco', SX0 + 0.1, SX1, y0, y1, 0.42, 0.62, M['navy'], bevel=0.05)
+    box('sofa_braco', SX0 + 0.1, SX1, y0, y1, 0.42, 0.62, M_SOFA, bevel=0.05)
 for i, (y0, y1) in enumerate(((1.15, 1.9), (1.9, 2.65), (2.65, 3.15))):
-    box('assento', SX0 + 0.02, SX1 - 0.22, y0 + 0.01, y1 - 0.01, 0.42, 0.52, M['navy'], bevel=0.05)
-    box('almofada_encosto', SX1 - 0.4, SX1 - 0.2, y0 + 0.02, y1 - 0.02, 0.52, 0.95, M['navy'], bevel=0.07)
+    box('assento', SX0 + 0.02, SX1 - 0.22, y0 + 0.01, y1 - 0.01, 0.42, 0.52, M_SOFA, bevel=0.05)
+    box('almofada_encosto', SX1 - 0.4, SX1 - 0.2, y0 + 0.02, y1 - 0.02, 0.52, 0.95, M_SOFA, bevel=0.07)
 for (x, y) in ((1.85, 0.97), (3.3, 0.97), (1.85, 3.28), (3.3, 3.28)):
     box('pe_sofa', x - 0.02, x + 0.02, y - 0.02, y + 0.02, 0, 0.1, M['black'])
 # aparador atrás do sofá
@@ -642,7 +707,7 @@ sphere('suculenta_f', 1.35, 2.5, 0.53, 0.06, M['leaf'], scale=(1, 1, 0.6))
 # poltronas de palhinha (topo e base do tapete)
 def armchair(cx, cy, facing):
     o = []
-    o.append(box('poltrona_assento', cx - 0.36, cx + 0.36, cy - 0.34, cy + 0.34, 0.38, 0.46, M['linen'], bevel=0.03))
+    o.append(box('poltrona_assento', cx - 0.36, cx + 0.36, cy - 0.34, cy + 0.34, 0.38, 0.46, M['linen'] if APTO == '303' else M['ceramic'], bevel=0.03))
     back = (cy - 0.36, cy - 0.3) if facing > 0 else (cy + 0.3, cy + 0.36)
     o.append(box('poltrona_encosto', cx - 0.34, cx + 0.34, back[0], back[1], 0.46, 0.85, M['cane'], bevel=0.01))
     for sx in (-1, 1):
@@ -771,7 +836,14 @@ world.use_nodes = True
 bg = world.node_tree.nodes['Background']
 # paisagem 360° (vista do terraço da 303) como mundo: centro da imagem = +x da planta (serra/cidade)
 # a foto real (vista_real.py) tem prioridade sobre a paisagem antiga gerada por IA
-PAISAGEM = os.path.join(ORIG, 'vista303', 'paisagem_360_real.png')
+# Para a 304 vale `_originais/vista304/paisagem_360_real.png` (vista_real.py 304). Enquanto ela não existir, a 304 usa a
+# paisagem da 303 ESPELHADA, só como provisório (a vista real da 304 é outra).
+VISTA_DIR = os.path.join(ORIG, 'vista' + APTO)
+MUNDO_PROVISORIO = False
+PAISAGEM = os.path.join(VISTA_DIR, 'paisagem_360_real.png')
+if not os.path.exists(PAISAGEM) and APTO != '303':
+    VISTA_DIR = os.path.join(ORIG, 'vista303'); MUNDO_PROVISORIO = True
+    PAISAGEM = os.path.join(VISTA_DIR, 'paisagem_360_real.png')
 if not os.path.exists(PAISAGEM):
     PAISAGEM = os.path.join(ORIG, 'vista303', 'paisagem_360.png')
 env = None
@@ -779,6 +851,12 @@ if os.path.exists(PAISAGEM):
     env = world.node_tree.nodes.new('ShaderNodeTexEnvironment')
     env.image = bpy.data.images.load(PAISAGEM)
     world.node_tree.links.new(env.outputs['Color'], bg.inputs['Color'])
+    if MUNDO_PROVISORIO:
+        tcw = world.node_tree.nodes.new('ShaderNodeTexCoord'); mpw = world.node_tree.nodes.new('ShaderNodeMapping')
+        mpw.vector_type = 'VECTOR'; mpw.inputs['Scale'].default_value = (1, -1, 1)
+        world.node_tree.links.new(tcw.outputs['Generated'], mpw.inputs['Vector'])
+        world.node_tree.links.new(mpw.outputs['Vector'], env.inputs['Vector'])
+        print('AVISO: 304 com a paisagem da 303 espelhada (provisório)', flush=True)
 bg.inputs['Color'].default_value = (*srgb('#6fa3dc'), 1)
 bg.inputs['Strength'].default_value = 1.6
 
@@ -840,6 +918,16 @@ box('cortineiro', -0.15, 4.75, 0.0, 0.2, H - 0.03, H, M['plaster_white'])
 # ================================================================== SUÍTES E BANHEIROS
 exec(compile(open(os.path.join(HERE, 'cena_suites.py')).read(), 'cena_suites.py', 'exec'))
 
+# ================================================================== ESPELHO 304
+if APTO == '304':
+    # tudo o que foi montado (geometria e luzes) vira filho de um vazio com escala Y = -1; as câmeras ficam fora dele
+    # e só têm a posição espelhada, senão a imagem sairia desespelhada.
+    eixo = bpy.data.objects.new('espelho_304', None); col.objects.link(eixo)
+    for o in list(scene.objects):
+        if o is not eixo and o.parent is None:
+            o.parent = eixo
+    eixo.scale = (1, -1, 1)
+
 # ================================================================== RENDER
 scene.render.engine = 'CYCLES'
 try:
@@ -878,7 +966,7 @@ def camera(name, loc, rot_deg, pano=False, lens=20):
     else:
         cd.lens = lens
     o = bpy.data.objects.new(name, cd); col.objects.link(o)
-    o.location = (loc[0], -loc[1], loc[2])
+    o.location = (loc[0], -loc[1] if APTO == '303' else loc[1], loc[2])
     o.rotation_euler = tuple(math.radians(a) for a in rot_deg)
     return o
 
@@ -901,13 +989,16 @@ SHOTS = {
     'living_persp':  dict(loc=(4.2, 4.6, 1.35), rot=(84, 0, 128), lens=16),
     'cozinha_persp': dict(loc=(0.9, 5.6, 1.4), rot=(80, 0, -145), lens=17),
 }
+if APTO == '304':      # terraço e deck da 304 têm outra planta: pontos próprios (afastados dos guarda-corpos)
+    SHOTS['terraco_360']['loc'] = (9.6, 4.6, 1.6)
+    SHOTS['deck_360']['loc'] = (13.9, 2.55, 1.6)
 for name, s in SHOTS.items():
     if ONLY and name not in ONLY:
         continue
     cam = camera(name, s['loc'], s['rot'], s.get('pano', False), s.get('lens', 20))
     scene.view_settings.exposure = s.get('exposure', 1.1)
     scene.camera = cam
-    mundo = os.path.join(ORIG, 'vista303', s.get('mundo', ''))
+    mundo = os.path.join(VISTA_DIR, s.get('mundo', ''))
     if env and s.get('mundo') and os.path.exists(mundo):
         env.image = bpy.data.images.load(mundo)
     elif env:

@@ -283,6 +283,23 @@ antes do refinamento.**
 **Para ver localmente:** `python3 -m http.server 8765` na pasta do site e abrir `http://127.0.0.1:8765/tour-303/`.
 Ao trocar uma imagem, mudar o `?v=` na função `src()` da página, senão o navegador mostra a antiga.
 
+**Tour da 304 (`tour-304/`, criado em 07/10/2026):** é o modelo da 303 **espelhado** (`--apto 304` no `cena_living.py`;
+o espelho é aplicado no fim, as câmeras só têm a posição espelhada). Render:
+`Blender -b -P cena_living.py -- --apto 304 --out render/304 --samples 48 --res 2688 --only <ambientes>`.
+Cores pela planta humanizada da 304: master azul, suíte 2 areia, suíte 3 verde, sofá claro, poltronas verdes,
+espreguiçadeiras claras. A página é cópia da 303 com os `yaw` de sinal trocado e os pontos na planta da 304.
+Decoração própria ("litoral natural", referências em `_originais/referencias/decoracao304/`): linho e areia, madeira clara,
+pedra clara na parede da TV, pares de marinhas, azul-claro/areia/sálvia nas camas; banhos em porcelanato marmorizado claro
+(fotos `assets/img/coberturas/304-banho*.webp`), com azulejos como na 303 por decisão do cliente (as fotos da 304 mostram
+dois banhos azuis e um verde). Terraço próprio da 304 pela planta: deck começa em x = 12,5 e é mais largo na fachada
+(17,1 → 15,9 m, medido pela imagem), lareira com 4 poltronas escuras e sofá, 2 chaises no fundo, jacuzzi no canto da fachada.
+**Decisão do cliente (07/10/2026):** forro de madeira do living e piso de madeira das suítes ficam como decoração nas duas
+coberturas, embora nas fotos reais o forro seja branco e o piso das suítes seja porcelanato cinza.
+**Pendente na 304:** (1) vista real — sem `_originais/vista304/paisagem_360_real.png` o render usa a vista da 303 espelhada,
+que **não é a vista da 304**; criar a entrada `'304'` em `VISTAS` no `vista_real.py`; (2) degraus do deck e living com
+mesa de jantar oval, como na planta; móveis das referências (cama em plataforma, pendente de palha, oliveira em vaso);
+(3) conferir a 304 no DWG; (4) conferir no navegador os pontos da planta e os botões entre ambientes.
+
 **Regras aprendidas (valem para a 304):**
 - Ponto do tour a menos de ~1,8 m de um guarda-corpo de vidro enxerga, pelo vidro, abaixo de onde a foto da vista termina
   (~35° abaixo do horizonte) e aparece uma faixa embaçada. Afastar o ponto ou pedir foto com mais área para baixo.
