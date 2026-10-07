@@ -254,33 +254,99 @@ obrigadocorretor, outroimovel, corretores) e manda endereços inexistentes para 
   seção de vista com a vista a partir do solarium.
 - Cache da HostGator: o `.htaccess` impede o proxy de guardar o HTML (cabeçalho `X-Accel-Expires: 0`).
 
-**Próximo passo:** continuar o tour 360° da 303 (seção 8).
+### Tour 360° — sessão de 07/10/2026
+
+- **Vista real** das coberturas como paisagem do 3D (panorâmica do terraço, versão ampla; no deck, a versão que pega o mar).
+- **DWG do projeto** guardado em `_originais/projeto/` e conferido (medidas na seção 8).
+- **Ambientes novos na 303:** deck e jacuzzi, suíte master, suítes 2 e 3 e os três WCs (10 pontos no total).
+- **Banhos com os revestimentos reais** (fotos em `_originais/referencias/`); cubas ocas, misturador e chuveiro de parede.
+- **Terraço:** ducha externa com revestimento no muro cinza, guarda-corpo contínuo por toda a fachada e na quina,
+  pingadeira sobre as muretas, floreira terminando antes da ducha, água na jacuzzi.
+- **Decoração:** master sem bancada, com painel ripado, pendentes e quadros; suítes 2 e 3 com ripado, quadro grande e aparador.
+- **Página do tour refeita:** abre no living virado para o terraço; barra de ambientes no rodapé (com setas quando não cabe
+  e botão de esconder); planta humanizada recortada num cartão ao lado da barra; "WC" no lugar de "Banho"; botões de
+  navegação em pílula, centralizados na porta; zoom e tela cheia em vidro escuro; carregamento sem caixa.
+
+**Próximo passo:** receber as vistas reais da 304 e dos quartos, refinar os ambientes das duas coberturas na Higgsfield
+e publicar no GitHub Pages (seção 8).
 
 ---
 
-## 8. Piloto: Tour 360° Cobertura 303 (em aprovação com o cliente, 28/09/2026)
+## 8. Tour 360° das Coberturas 303 e 304 (em construção; piloto da 303 com 3 ambientes publicado em 28/09/2026)
 
-Pasta `tour-303/` (não linkada no site). Ambientes prontos: **Terraço**, **Living e jantar**, **Cozinha**.
+Pasta `tour-303/` (não linkada no site). **No GitHub Pages** continuam os 3 ambientes refinados do piloto (Terraço, Living
+e jantar, Cozinha). **No ramo `main`**, desde 07/10/2026, `tour-303/` tem a página nova e os 10 ambientes em **render cru do
+Blender** (sem refinamento por IA): Living e jantar, Cozinha, Terraço, Deck e jacuzzi, Suíte master, Suíte 2, Suíte 3 e os
+três WCs. As imagens refinadas antigas estão no histórico do Git e no ramo `gh-pages`. **Não publicar o `main` no Pages
+antes do refinamento.**
+
+**Para ver localmente:** `python3 -m http.server 8765` na pasta do site e abrir `http://127.0.0.1:8765/tour-303/`.
+Ao trocar uma imagem, mudar o `?v=` na função `src()` da página, senão o navegador mostra a antiga.
+
+**Regras aprendidas (valem para a 304):**
+- Ponto do tour a menos de ~1,8 m de um guarda-corpo de vidro enxerga, pelo vidro, abaixo de onde a foto da vista termina
+  (~35° abaixo do horizonte) e aparece uma faixa embaçada. Afastar o ponto ou pedir foto com mais área para baixo.
+- A câmera não pode ficar na linha de uma parede: a porta que está nela some (aconteceu com o WC da master).
+- Peças com faces coincidentes saem pretas no render (cuba, piso duplicado). Não sobrepor caixas no mesmo plano.
+- Topo branco de mureta reflete o céu e parece fresta azul: usar pingadeira. Muretas descem até a laje.
+- Hotspots do Pannellum ancoram pelo canto: o elemento tem tamanho zero e o conteúdo se centraliza com `translate(-50%,-50%)`.
+- Direção dos botões: `yaw = atan2(-dy, -dx)` em coordenadas de planta da 303 (na 304, espelhada, o yaw troca de sinal).
+- Não encadear renders com `pgrep` esperando outro Blender: duas filas ficaram esperando uma pela outra. Rodar um comando só.
+
+**Fontes do projeto (em `_originais/`, fora do repositório do site):**
+- `projeto/17-268-REM-ITAUB_EST.18_R00_V21.dwg`: projeto arquitetônico (todos os pavimentos; a cobertura é a planta
+  mais à direita do desenho, a 303 é o apartamento de cima à esquerda). Para ler as cotas:
+  `dwg2dxf -y -o planta.dxf <arquivo.dwg>` (LibreDWG, `brew install libredwg`) e abrir o DXF com `ezdxf` em Python.
+- `planta303.png`: planta humanizada (material de venda). **É ela que define o layout e o mobiliário do tour.**
+- `vista303/vista_303_real_ampla.webp`: panorâmica real tratada, tirada do terraço da 303, com área para baixo até ~37° do
+  horizonte (07/10/2026). **É a base da paisagem de todos os ambientes.** Na mesma pasta ficam as versões anteriores
+  (`vista_303_real.webp`, `vista_303_real_ext.png`) e a foto original nublada (`vista_303_original_nublada.jpg`).
+- `referencias/303-banho-master.webp` e `303-banho-suites.webp`: fotos dos banhos como entregues. **Os revestimentos do tour
+  têm de ser estes** (pedido do cliente): porcelanato cinza-claro em placas grandes no piso e nas paredes, fundo do box em
+  azulejo quadrado brilhante (azul-marinho na master, verde-acinzentado nas suítes 2 e 3), bancada e moldura do nicho em
+  granito claro, cuba retangular branca de semi-encaixe. A decoração entra por cima dessa base; no refinamento por IA,
+  mandar a foto como referência e pedir para não trocar os revestimentos.
+- `referencias/303-terraco-ducha-corredor.webp`: terraço como entregue. Mostra o **revestimento da ducha externa** no muro
+  de divisa (obrigatório no tour; o muro é cinza), o forro de madeira do corredor da varanda com plafons pretos e a mureta com vidro.
+- `vista303/vista_303_deck.jpg`: panorâmica mais aberta (pega o mar à esquerda) e com mais área para baixo (até ~34° abaixo
+  do horizonte), usada **só no deck**. Substituiu `vista_303_aberta.png`, que ia só até ~21°.
+
+**O que foi conferido no DWG:** living 4,85 m de fachada; suítes 2,70 / 2,75 / 2,70 m; esquadrias de 2,60 m de altura
+em toda a largura das suítes (2,80 + 1,35 fixo no living, porta living/terraço 3,60 m); portas internas 0,80 e 0,70 x 2,10 m;
+varanda da frente contínua por toda a fachada (da suíte 1 ao terraço), com ~1,26 m livres; projeção da cobertura gourmet ~3,9 m;
+pé-direito 2,80 m. **Diferenças conhecidas:** no DWG o terraço é reto e mais comprido (~11,9 m) e os banhos das suítes têm
+outra posição; o tour segue a planta humanizada (borda inclinada do deck, banhos ao fundo). Alturas de mureta (0,35 m) e
+do vidro do guarda-corpo (até 1,25 m) **não estão na planta**: são estimativas pelas fotos.
 
 **Como é feito (fluxo aprovado):**
-1. Modelo 3D no Blender (`_ferramentas/tour303/cena_living.py`) seguindo a **planta humanizada**, com medidas do DWG
-   (`17-268-REM-ITAUB_EST.18_R00_V21.dwg`): esquadrias 2,60 m de altura, porta living/terraço 3,60 m, cobertura ~3,9 m, pé-direito 2,80 m.
-2. Paisagem 360° (`_originais/vista303/paisagem_360.png`) gerada por IA a partir das fotos reais do terraço,
-   usada como "mundo" do 3D (centro da imagem = saída do living para o terraço: serra e cidade; esquerda = parque e morro).
-   `vista_pano.py` posiciona as fotos por direção (guia para a IA). **Trocar por foto 360° real quando houver.**
-3. Render equirretangular "sem acabamento" no Blender (~2 min por ambiente):
-   `Blender -b -P cena_living.py -- --out render/vX --samples 48 --res 2688 --only terraco_360,living_360,cozinha_360`
+1. Modelo 3D no Blender: `_ferramentas/tour303/cena_living.py` (living, cozinha, terraço, deck) + `cena_suites.py`
+   (suítes e banhos; é executado pelo primeiro). Coordenadas em metros, origem no canto interno do living junto à suíte 3.
+2. Paisagem 360° **real**: `python vista_real.py 303` projeta a panorâmica do terraço (cilíndrica, ~190° de largura,
+   centro apontando 52° à esquerda da saída living→terraço) em `_originais/vista303/paisagem_360_real.png`, usada como
+   "mundo" do 3D. O céu é continuado até o zênite; o que a foto não cobre (atrás do prédio) é espelho da própria foto.
+   Para o deck: `python vista_real.py 303_deck` junta a vista mais aberta (à esquerda) com a do terraço (à direita) em
+   `paisagem_360_real_deck.png`; o `deck_360` usa esse mundo (campo `mundo` em `SHOTS`) e fica na borda da frente, ao lado
+   da jacuzzi, único ponto do deck de onde o prédio não esconde o lado do mar.
+   A paisagem antiga gerada por IA (`paisagem_360.png`, via `vista_pano.py`) só é usada se a real não existir.
+3. Render equirretangular "sem acabamento" (~1,5 min por ambiente):
+   `Blender -b -P cena_living.py -- --out render/vX --samples 48 --res 2688 --only terraco_360,living_360,cozinha_360,deck_360,suite1_360,suite2_360,suite3_360,banho1_360,banho2_360,banho3_360`
 4. Refinamento "IA única" na Higgsfield (GPT Image 2.5, 21:9, qualidade alta, ~2,75 créditos/ambiente),
-   usando a versão refinada anterior como referência de estilo.
-5. Exportar em WebP 4096×2048 para `tour-303/img/<ambiente>.webp`. Visualizador: Pannellum (CDN); no celular roda só na horizontal.
+   usando a versão refinada anterior como referência de estilo. **A IA redesenha a paisagem**: depois do refinamento,
+   recolocar a vista real nas áreas de céu/paisagem (máscara tirada do próprio Blender).
+5. Exportar em WebP 4096×2048 para `tour-303/img/<ambiente>.webp` e incluir o ambiente em `ROOMS` no `tour-303/index.html`.
+   Visualizador: Pannellum (CDN); no celular roda só na horizontal.
 
 **Publicado para o cliente:** https://erichprates.github.io/ankor-site/tour-303/ (sem link no site, sem nota de "ilustrativo" a pedido).
+Ainda com a paisagem antiga de IA e só 3 ambientes; os renders novos estão em `_ferramentas/tour303/render/v5/` (fora do Git).
 
 **Recursos do visualizador:** começa no Terraço; pré-carrega todos os ambientes em segundo plano (troca ~0,3 s);
 gira sozinho a 2°/s, para quando a pessoa toca/arrasta e volta após 8 s parado; no celular só na horizontal.
 
-**Ajustes manuais:** `tour-303/img/terraco.webp` teve a "porta" do muro removida no Photoshop
-(cópia em `_ferramentas/tour303/render/v4/terraco_final_photoshop.webp`). Ao refazer o terraço, **tirar o
-painel de pedra do modelo** para não voltar.
+**Ajustes no modelo em 07/10/2026:** vista real como mundo; o painel de pedra do muro do terraço é a **ducha externa**: voltou ao modelo com braço, ducha e
+registros (sem eles o refinamento o transformava em "porta"); muro de divisa cinza; plafons pretos no corredor da varanda;
+suíte master sem bancada, com painel ripado, pendentes e painel de TV em madeira escura; banhos com cuba oca e misturador; guarda-corpo, piso e forro da varanda estendidos por toda a fachada; muretas descem até a laje e ganharam
+pingadeira de pedra clara (o topo branco refletia o céu e parecia uma fresta azul); vidro embutido na mureta.
 
-**Pendências:** retorno do cliente; deck com jacuzzi, 3 suítes e banheiros; foto 360° real do terraço.
+**Pendências:** refinar na Higgsfield os 10 ambientes (conectar a conta nova em `/mcp`) e recolocar a vista real;
+conferir no deck, pelo vidro do guarda-corpo, se ainda aparece a faixa lisa onde as fotos acabam (~34 a 37° abaixo do horizonte); vistas reais dos quartos (o usuário vai enviar);
+vista real da 304 (`ap-304.jpg`) e tour da 304; lavabo e corredor não modelados; retorno do cliente.

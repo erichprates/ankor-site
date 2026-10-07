@@ -425,8 +425,14 @@ def edge_x(y): return 13.6 + (y + 1.3) * (1.25 / 10.3)
 TOP, BOT = -1.3, 9.05
 
 # varanda frontal das suítes/living
-box('varanda_frontal', -1.6, 4.75, -1.3, -0.15, -0.06, -0.01, M['porc_dark'])
-box('forro_varanda', -1.6, 4.75, -1.3, -0.15, H, H + 0.05, M['ceiling'])
+# (na planta ela corre por toda a frente, do canto da suíte 1 até o terraço: VAR_X0 ≈ -8,8 m)
+VAR_X0 = -8.8
+box('varanda_frontal', VAR_X0, 4.75, -1.3, -0.15, -0.06, -0.01, M['porc_dark'])
+box('forro_varanda', VAR_X0, 4.75, -1.3, -0.15, H, H + 0.05, M['ceiling'])
+# plafons pretos de sobrepor no forro de madeira do corredor da varanda (como na foto)
+for xv in (-7.6, -5.4, -3.2, -1.0, 1.2, 3.4):
+    box('plafon_varanda', xv - 0.07, xv + 0.07, -0.8, -0.66, H - 0.035, H, M['black'])
+box('fecho_varanda', VAR_X0 - 0.15, VAR_X0, -1.5, 0.0, -0.06, H, M['white'])
 # área gourmet coberta (piso escuro) x 4.75–8.25
 box('piso_gourmet', 4.75, 8.65, TOP, BOT, -0.06, -0.01, M['porc_dark'])
 # solarium descoberto (piso claro) x 8.25–11.0
@@ -440,15 +446,22 @@ box('forro_gourmet', 4.75, 8.65, TOP, BOT, H - 0.02, H, M['ceiling'])
 # colunas redondas brancas na borda da cobertura (como nas fotos)
 for yy in (-0.9, 3.9, 8.6):
     cyl('coluna', 8.5, yy, 0, H, 0.13, M['white'])
-# platibanda + guarda-corpo de vidro na frente e na borda inclinada
-box('mureta_frente', 4.75, edge_x(TOP), TOP - 0.2, TOP, 0, 0.35, M['white'])
-box('vidro_frente', 4.75, edge_x(TOP), TOP - 0.12, TOP - 0.1, 0.35, 1.25, M['glass'])
-box('corrimao_frente', 4.75, edge_x(TOP), TOP - 0.13, TOP - 0.09, 1.25, 1.28, M['steel'])
-prism('mureta_lateral', [(edge_x(TOP), TOP), (edge_x(TOP) + 0.2, TOP), (edge_x(BOT) + 0.2, BOT), (edge_x(BOT), BOT)], 0, 0.35, M['white'])
-prism('vidro_lateral', [(edge_x(TOP) + 0.09, TOP), (edge_x(TOP) + 0.11, TOP), (edge_x(BOT) + 0.11, BOT), (edge_x(BOT) + 0.09, BOT)], 0.35, 1.25, M['glass'])
-prism('corrimao_lateral', [(edge_x(TOP) + 0.08, TOP), (edge_x(TOP) + 0.12, TOP), (edge_x(BOT) + 0.12, BOT), (edge_x(BOT) + 0.08, BOT)], 1.25, 1.28, M['steel'])
+# platibanda + guarda-corpo de vidro na frente (desde a varanda frontal do living) e na borda inclinada
+# (na quina com a borda inclinada, as peças da frente avançam até a linha das laterais e as laterais começam
+#  onde as da frente terminam: guarda-corpo contínuo, sem vão e sem faces sobrepostas)
+box('mureta_frente', VAR_X0, edge_x(TOP) + 0.2, TOP - 0.2, TOP, -0.06, 0.35, M['white'])   # desce até a laje: sem fresta com o piso
+box('vidro_frente', VAR_X0, edge_x(TOP) + 0.11, TOP - 0.12, TOP - 0.1, 0.30, 1.25, M['glass'])   # vidro embutido na mureta: sem fresta na base
+# pingadeira em pedra clara sobre as muretas (sem ela o topo branco reflete o céu e parece uma fresta azul)
+M['pingadeira'] = mat('pingadeira', srgb('#b9b0a2'), 0.7)
+box('pingadeira_frente', VAR_X0, edge_x(TOP) + 0.21, TOP - 0.21, TOP + 0.01, 0.35, 0.365, M['pingadeira'])
+prism('pingadeira_lateral', [(edge_x(TOP) - 0.01, TOP + 0.01), (edge_x(TOP) + 0.21, TOP + 0.01), (edge_x(BOT) + 0.21, BOT), (edge_x(BOT) - 0.01, BOT)], 0.35, 0.365, M['pingadeira'])
+box('corrimao_frente', VAR_X0, edge_x(TOP) + 0.12, TOP - 0.13, TOP - 0.09, 1.25, 1.28, M['steel'])
+prism('mureta_lateral', [(edge_x(TOP), TOP), (edge_x(TOP) + 0.2, TOP), (edge_x(BOT) + 0.2, BOT), (edge_x(BOT), BOT)], -0.06, 0.35, M['white'])
+prism('vidro_lateral', [(edge_x(TOP) + 0.09, TOP - 0.1), (edge_x(TOP) + 0.11, TOP - 0.1), (edge_x(BOT) + 0.11, BOT), (edge_x(BOT) + 0.09, BOT)], 0.30, 1.25, M['glass'])
+prism('corrimao_lateral', [(edge_x(TOP) + 0.08, TOP - 0.09), (edge_x(TOP) + 0.12, TOP - 0.09), (edge_x(BOT) + 0.12, BOT), (edge_x(BOT) + 0.08, BOT)], 1.25, 1.28, M['steel'])
 # muro dos fundos (divisa) com painel de pedra, como na foto
-box('muro_fundos', 5.9, edge_x(BOT) + 0.2, BOT, BOT + 0.2, 0, 2.1, M['white'])
+M['muro'] = mat('muro_cinza', srgb('#a9ac9f'), 0.85)      # muro de divisa pintado de cinza, como na foto
+box('muro_fundos', 5.9, edge_x(BOT) + 0.2, BOT, BOT + 0.2, -0.06, 2.1, M['muro'])
 # painel de revestimento em pedra no muro (como na foto real) — com textura de pedra, rente à parede
 def stone_build(nt, b):
     br = nt.nodes.new('ShaderNodeTexBrick')
@@ -468,11 +481,20 @@ def stone_build(nt, b):
     b.inputs['Roughness'].default_value = 0.9
     bump = nt.nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value = 0.8
     nt.links.new(nz.outputs['Fac'], bump.inputs['Height']); nt.links.new(bump.outputs['Normal'], b.inputs['Normal'])
-box('painel_pedra', 11.2, 12.0, BOT - 0.01, BOT, 0.0, 2.1, node_mat('pedra_natural', stone_build))
+# É o revestimento da DUCHA externa (foto _originais/referencias/303-terraco-ducha-corredor.webp) e tem de aparecer.
+# Sem a ducha modelada, o refinamento por IA transformava o painel numa "porta": por isso o braço, a ducha e os registros.
+box('painel_ducha', 11.0, 12.2, BOT - 0.012, BOT, 0.0, 2.1, node_mat('pedra_natural', stone_build))
+box('ducha_braco', 11.59, 11.61, BOT - 0.38, BOT - 0.012, 2.0, 2.02, M['steel'])
+cyl('ducha_descida', 11.6, BOT - 0.37, 1.96, 2.0, 0.01, M['steel'])
+cyl('ducha', 11.6, BOT - 0.37, 1.94, 1.96, 0.1, M['steel'])
+for xr in (11.48, 11.72):
+    box('ducha_registro', xr - 0.03, xr + 0.03, BOT - 0.045, BOT - 0.012, 1.1, 1.16, M['steel'], bevel=0.008)
+box('ducha_ralo', 11.4, 11.8, BOT - 0.55, BOT - 0.45, 0.0, 0.003, M['steel'])
 # jardineira no fim do deck
-box('jardineira', 11.8, edge_x(8.4) - 0.05, 8.4, 8.95, 0, 0.45, M['white'])
-for k in range(16):
-    sphere('arbusto', 11.95 + k * 0.17, 8.68, 0.5, 0.18, M['leaf'], scale=(1, 1, 0.7))
+# (começa depois do painel da ducha, que vai até x = 12,2, para não ficar na frente dela)
+box('jardineira', 12.4, edge_x(8.4) - 0.05, 8.4, 8.95, 0, 0.45, M['white'])
+for k in range(13):
+    sphere('arbusto', 12.55 + k * 0.17, 8.68, 0.5, 0.18, M['leaf'], scale=(1, 1, 0.7))
 
 # --- área gourmet coberta: mesa de 10 lugares + bancada em L com cuba e churrasqueira
 GX0, GX1, GY0, GY1 = 6.05, 7.05, 0.95, 3.6
@@ -528,7 +550,7 @@ cyl('mesinha_chaise', 10.2, 5.3, 0, 0.45, 0.14, M['wood'])
 
 # --- deck: jacuzzi + 3 espreguiçadeiras
 box('jacuzzi_borda', 11.15, 13.05, -0.75, 1.45, 0.0, 0.55, M['white'])
-box('jacuzzi_agua', 11.3, 12.9, -0.6, 1.3, 0.3, 0.5, M['water'])
+box('jacuzzi_agua', 11.3, 12.9, -0.6, 1.3, 0.3, 0.553, M['water'])   # lâmina um fio acima da borda maciça, senão não aparece
 for y0 in (2.6, 3.85, 5.25):
     x0 = 12.2 + (y0 - 2.6) * 0.1
     box('espreg', x0, x0 + 1.9, y0, y0 + 0.72, 0.18, 0.34, M['navy'], bevel=0.03)
@@ -748,7 +770,11 @@ world = bpy.data.worlds.new('ceu'); scene.world = world
 world.use_nodes = True
 bg = world.node_tree.nodes['Background']
 # paisagem 360° (vista do terraço da 303) como mundo: centro da imagem = +x da planta (serra/cidade)
-PAISAGEM = os.path.join(ORIG, 'vista303', 'paisagem_360.png')
+# a foto real (vista_real.py) tem prioridade sobre a paisagem antiga gerada por IA
+PAISAGEM = os.path.join(ORIG, 'vista303', 'paisagem_360_real.png')
+if not os.path.exists(PAISAGEM):
+    PAISAGEM = os.path.join(ORIG, 'vista303', 'paisagem_360.png')
+env = None
 if os.path.exists(PAISAGEM):
     env = world.node_tree.nodes.new('ShaderNodeTexEnvironment')
     env.image = bpy.data.images.load(PAISAGEM)
@@ -811,6 +837,9 @@ curtain(3.6, 4.2, 4.63, axis='y')
 # trilho da cortina (cortineiro embutido)
 box('cortineiro', -0.15, 4.75, 0.0, 0.2, H - 0.03, H, M['plaster_white'])
 
+# ================================================================== SUÍTES E BANHEIROS
+exec(compile(open(os.path.join(HERE, 'cena_suites.py')).read(), 'cena_suites.py', 'exec'))
+
 # ================================================================== RENDER
 scene.render.engine = 'CYCLES'
 try:
@@ -858,7 +887,16 @@ SHOTS = {
     'living_360':  dict(loc=(1.95, 2.8, 1.6), rot=(90, 0, 90), pano=True),
     'cozinha_360': dict(loc=(2.9, 6.1, 1.6), rot=(90, 0, 90), pano=True),
     'terraco_360': dict(loc=(9.7, 2.9, 1.6), rot=(90, 0, 90), pano=True, exposure=-0.6),
-    'deck_360':    dict(loc=(12.0, 3.0, 1.6), rot=(90, 0, 90), pano=True, exposure=-0.6),
+    # no deck a paisagem é a versão com a vista mais aberta (mar à esquerda): vista_real.py 303_deck.
+    # O ponto fica entre a jacuzzi e as espreguiçadeiras, a ~1,9 m do guarda-corpo lateral: mais perto que isso a câmera
+    # enxerga, pelo vidro, abaixo de onde as fotos da vista terminam (~35° abaixo do horizonte).
+    'deck_360':    dict(loc=(12.15, 1.78, 1.6), rot=(90, 0, 90), pano=True, exposure=-0.6, mundo='paisagem_360_real_deck.png'),
+    'suite1_360':  dict(loc=(-6.85, 3.25, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5),
+    'suite2_360':  dict(loc=(-4.9, 3.05, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5),
+    'suite3_360':  dict(loc=(-1.95, 3.2, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5),
+    'banho1_360':  dict(loc=(-8.0, 4.75, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5),
+    'banho2_360':  dict(loc=(-3.65, 4.75, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5),
+    'banho3_360':  dict(loc=(-0.85, 4.75, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5),
     # perspectivas (para refinamento na Higgsfield e comparação)
     'living_persp':  dict(loc=(4.2, 4.6, 1.35), rot=(84, 0, 128), lens=16),
     'cozinha_persp': dict(loc=(0.9, 5.6, 1.4), rot=(80, 0, -145), lens=17),
@@ -869,6 +907,11 @@ for name, s in SHOTS.items():
     cam = camera(name, s['loc'], s['rot'], s.get('pano', False), s.get('lens', 20))
     scene.view_settings.exposure = s.get('exposure', 1.1)
     scene.camera = cam
+    mundo = os.path.join(ORIG, 'vista303', s.get('mundo', ''))
+    if env and s.get('mundo') and os.path.exists(mundo):
+        env.image = bpy.data.images.load(mundo)
+    elif env:
+        env.image = bpy.data.images.load(PAISAGEM, check_existing=True)
     if s.get('pano'):
         scene.render.resolution_x, scene.render.resolution_y = RES, RES // 2
     else:
