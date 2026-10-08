@@ -391,8 +391,6 @@ uma vez ("Arraste para olhar em volta").
 - **Carregamento em duas etapas:** todo ambiente abre pela imagem leve de `img/m/`; no computador a de 4096 px carrega em
   seguida e entra por cima com fade (cenas `<id>_hd`; a função `atual()` devolve o ambiente sem o sufixo). No celular fica
   só a leve. A primeira imagem tem `<link rel="preload">` no `<head>` (o `?v=` dele tem de ser o mesmo de `src()`).
-- **Frases no carregamento** (`.frases`, só no primeiro ambiente): área, suítes, varanda gourmet, solarium e localização,
-  com os mesmos dados das páginas das coberturas. Não escrever "de frente para o mar": a cobertura é posterior.
 - No celular não há controles do visualizador na tela (zoom com dois dedos; tela cheia não funciona no iPhone).
 - Pontos na planta: os das suítes ficam do lado da janela, afastados dos de WC, para facilitar o toque.
 
