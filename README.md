@@ -33,7 +33,7 @@ assets/img/                    Fotos otimizadas em WebP
   hero/                          topo da home (hero-1…5) e topo das LPs (lp-303, lp-304)
   empreendimento/ lazer/ localizacao/ coberturas/ vista/ plantas/ videos/
 assets/brand/                  Logo Ankor (PNG) e logo Convênio (SVG)
-_ferramentas/                  Scripts que geram imagens e landing pages (ver seção 4)
+_ferramentas/                  Scripts que geram imagens e landing pages (ver seção 4) e o publicar.py (ver seção 5)
 _originais/                    Fotos em tamanho original (~104 MB). Fora deste repositório; backup no repo privado ankor-originais
 ```
 
@@ -155,7 +155,16 @@ esse número em `index.html` e na constante `V` do `gerar_landing_pages.py` (e g
 senão celulares podem continuar mostrando a versão antiga.
 
 **Rastreamento (todas as páginas):** GTM `GTM-N2VF7FVX`, GA4 `G-858ZVEWJJ1` e Google Ads
-`AW-10869641873` (as duas últimas direto, como no WordPress antigo) e Meta Pixel `279593157240250`.
+`AW-10869641873` (as duas últimas direto, como no WordPress antigo), Meta Pixel `279593157240250`
+e Contentsquare (antigo Hotjar, mapas de calor e gravações) com a tag `3d94dfe17b9cd`.
+
+**Contentsquare (antigo Hotjar):** o Hotjar virou Contentsquare; o painel é app.contentsquare.com (projeto 957332,
+"Project 1"). O código estava colado no WordPress antigo e se perdeu na troca do site; voltou em 08/10/2026.
+É uma linha no `<head>`: `<script async src="https://t.contentsquare.net/uxa/ID-DA-TAG.js"></script>`. Na home e nos
+tours ela está direto no HTML; nas LPs e nas páginas de obrigado vem da constante `CSQ` do `gerar_landing_pages.py`.
+Para achar o ID da tag de um projeto: no painel, tela **Tracking** das configurações do projeto (não fica em
+"Analysis setup"); a mesma tela tem o botão **Verify installation** e o aviso "Not capturing data" enquanto não chega visita.
+Página nova no site precisa receber essa linha junto com o GTM, o GA4 e o Pixel.
 
 **Páginas de obrigado** (geradas pelo `gerar_landing_pages.py`, dicionário `THANKS`, com `noindex`):
 - `obrigado/`: leads das coberturas 303/304. Dispara a conversão do Google Ads e o `Lead` do Pixel.
@@ -183,11 +192,34 @@ compartilhamento (og:image e og:url) aponta para construtoraconvenio.com.br; no 
 o tour para o `gh-pages`, mantenha lá esses endereços do github.io.
 
 **Publicar uma atualização:**
-1. `sh _ferramentas/empacotar.sh` (gera as LPs e cria `_deploy/ankor.zip`, com os tours 360° e sem ferramentas e originais).
-2. No cPanel, Gerenciador de Arquivos, `public_html/ankor`: envie o zip, extraia sobrescrevendo e apague o zip.
+1. `python3 _ferramentas/publicar.py` (gera as LPs e envia por SFTP o que mudou para `public_html/ankor`;
+   com `--simular` só lista o que enviaria). Usa a chave `~/.ssh/ankor_hostgator`, autorizada no cPanel em
+   Acesso SSH (a conta não tem shell, só SFTP). Só grava dentro de `public_html/ankor` e nunca apaga nada lá.
+2. Sem a chave (outro computador): `sh _ferramentas/empacotar.sh` cria `_deploy/ankor.zip`; no cPanel, Gerenciador
+   de Arquivos, `public_html/ankor`: envie o zip, extraia sobrescrevendo e apague o zip.
 3. Limpe o cache da HostGator (o servidor guarda páginas: cabeçalho `x-nginx-cache: WordPress`),
    senão a versão antiga pode continuar aparecendo por algumas horas.
 4. `git add -A && git commit -m "..." && git push` para guardar o histórico.
+5. Confira no ar: abra a página alterada (ou `curl -s https://construtoraconvenio.com.br/ankor/ | grep "trecho novo"`).
+
+**Cuidados no servidor:** a conta `con30882` hospeda mais coisas além do Ankor: o WordPress da construtora (raiz de
+`public_html`), `kanoah`, `box4pets_sites` e, dentro de `public_html/ankor`, as pastas `Antigo`, `antigo2` e `__MACOSX`.
+Não apague nem sobrescreva nada fora dos arquivos do site. O `publicar.py` já respeita isso; se um arquivo sair do
+site, ele continua no servidor até ser apagado à mão no cPanel.
+
+**Preparar a publicação automática em outro computador ou em outro site da HostGator** (feito aqui em 08/10/2026):
+1. Criar uma chave só para isso: `ssh-keygen -t ed25519 -N "" -C "nome-deploy" -f ~/.ssh/nome_hostgator`.
+2. No cPanel: Acesso SSH → Gerenciar chaves SSH → Importar chave. Preencher só o nome e a **chave pública**
+   (conteúdo de `~/.ssh/nome_hostgator.pub`); chave privada e senha ficam em branco.
+3. Na lista de chaves públicas: Gerenciar → **Autorizar**. Sem isso o servidor recusa (`Permission denied`).
+4. Anotar o usuário do cPanel ("Usuário atual", no canto direito do painel) e o IP do servidor (`dig +short dominio`).
+5. Testar: `echo "ls public_html" | sftp -i ~/.ssh/nome_hostgator -o IdentitiesOnly=yes -P 22 usuario@IP`.
+   Se listar as pastas, está pronto. A mensagem "Shell access is not enabled" ao tentar `ssh` é normal neste plano:
+   só o SFTP funciona, e por isso não dá para usar rsync nem limpar o cache por comando.
+6. Copiar o `_ferramentas/publicar.py` e ajustar `DESTINO`, `SERVIDOR`, `CHAVE` e `ITENS` no começo do arquivo.
+7. Rodar com `--simular` e, na primeira vez, comparar com o que está no ar antes de enviar de verdade.
+
+Nenhuma senha é usada nem guardada; para cortar o acesso, basta desautorizar ou apagar a chave no cPanel.
 
 O `.htaccess` redireciona os endereços do WordPress antigo (cobertura303, cobertura304,
 obrigadocorretor, outroimovel, corretores) e manda endereços inexistentes para a home.
@@ -264,6 +296,8 @@ obrigadocorretor, outroimovel, corretores) e manda endereços inexistentes para 
 
 - LPs 303 e 304: seção "Tour virtual 360°" depois da galeria, com a arte do tour como botão, item "Tour 360°" no menu,
   nota de decorado virtual (também no rodapé) e evento `tour_open`.
+- Contentsquare (antigo Hotjar) reinstalado nas 7 páginas, com a tag `3d94dfe17b9cd` (ver "Rastreamento", seção 4).
+- Publicação automática por SFTP com `_ferramentas/publicar.py`, sem subir zip à mão (ver seção 5).
 
 ### Tour 360° — sessão de 07/10/2026
 

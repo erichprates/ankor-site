@@ -13,6 +13,8 @@ Uso (na pasta do site):  python3 _ferramentas/gerar_landing_pages.py
 import os
 ROOT = os.environ.get('ANKOR_ROOT') or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Contentsquare (antigo Hotjar): mapas de calor e gravações de sessão
+CSQ = '<script async src="https://t.contentsquare.net/uxa/3d94dfe17b9cd.js"></script>'
 # Google Analytics 4 e Google Ads, as mesmas tags do WordPress antigo do /ankor
 # (ficam fora do GTM). A conversão do Ads é disparada só em /obrigado/.
 GTAG = """<script async src="https://www.googletagmanager.com/gtag/js?id=G-858ZVEWJJ1"></script>
@@ -117,6 +119,7 @@ def page(u, d):
 <script>(function(w,d,s,l,i){{w[l]=w[l]||[];w[l].push({{'gtm.start':new Date().getTime(),event:'gtm.js'}});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);}})(window,document,'script','dataLayer','GTM-N2VF7FVX');</script>
 {GTAG}
 <script>!function(f,b,e,v,n,t,s){{if(f.fbq)return;n=f.fbq=function(){{n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)}};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','279593157240250');fbq('track','PageView');fbq('track','ViewContent',{{content_name:'Cobertura {u}'}});</script>
+{CSQ}
 </head>
 <body>
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N2VF7FVX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -437,6 +440,7 @@ def thanks_page(d):
 {GTAG}
 {d['extra']}
 <script>!function(f,b,e,v,n,t,s){{if(f.fbq)return;n=f.fbq=function(){{n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)}};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','279593157240250');fbq('track','PageView');{d['pixel']}</script>
+{CSQ}
 </head>
 <body>
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N2VF7FVX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
