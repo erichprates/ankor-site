@@ -175,9 +175,12 @@ O GitHub Pages publica só os **tours 360°** (ramo `gh-pages`, que tem apenas `
 o logo e o favicon): https://erichprates.github.io/ankor-site/tour-303/ e `/tour-304/` . A raiz da prévia
 redireciona para o site oficial. Para atualizar o tour lá, copie os arquivos para o ramo `gh-pages`
 (por exemplo com `git worktree add ../ghp gh-pages`), faça commit e push. O ramo `main` é o histórico do site.
+Desde 08/10/2026 os tours também vão para o site oficial (`/ankor/tour-303/` e `/ankor/tour-304/`): no `main` a prévia de
+compartilhamento (og:image e og:url) aponta para construtoraconvenio.com.br; no `gh-pages`, para o github.io. Ao copiar
+o tour para o `gh-pages`, mantenha lá esses endereços do github.io.
 
 **Publicar uma atualização:**
-1. `sh _ferramentas/empacotar.sh` (gera as LPs e cria `_deploy/ankor.zip`, sem tour, ferramentas e originais).
+1. `sh _ferramentas/empacotar.sh` (gera as LPs e cria `_deploy/ankor.zip`, com os tours 360° e sem ferramentas e originais).
 2. No cPanel, Gerenciador de Arquivos, `public_html/ankor`: envie o zip, extraia sobrescrevendo e apague o zip.
 3. Limpe o cache da HostGator (o servidor guarda páginas: cabeçalho `x-nginx-cache: WordPress`),
    senão a versão antiga pode continuar aparecendo por algumas horas.
