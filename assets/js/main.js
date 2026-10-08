@@ -333,6 +333,9 @@
   });
 
   /* ---------- Formulário do respondi.app: repassa as UTMs da página para o formulário ---------- */
+  $$('[data-tour]').forEach(function (a) {
+    a.addEventListener('click', function () { track('tour_open', { unidade: a.getAttribute('data-tour') }); });
+  });
   var qs = window.location.search.substring(1);
   if (qs) $$('iframe[data-respondi]').forEach(function (f) { f.src = f.getAttribute('src') + '&' + qs; });
 

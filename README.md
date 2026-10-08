@@ -82,6 +82,9 @@ Textos conforme os PDFs das LPs.
 4. **Galeria de ambientes**: abas Todas / Living e cozinha / Vista para o mar / Solarium e área
    gourmet / Suítes e banheiros, mais **Vista para a serra** (só na 303). O botão "Ver todas
    as imagens" abre a galeria completa da unidade.
+   Logo depois da galeria vem a seção **Tour virtual 360°** (`#tour`, também no menu): a arte de compartilhamento do
+   tour (`assets/img/og/og-tour-30x.jpg`) é o botão, com "Iniciar o tour 360°" embaixo; abre `../tour-30x/` em **nova aba**
+   (pedido de 08/10). A nota sob o botão avisa que é ilustrativo e pode variar nos detalhes construtivos. Para trocar a arte, substitua o JPG (1200×630) com o mesmo nome.
 5. **Vista para o mar e implantação**: esquema ilustrativo (SVG) com a unidade destacada e a
    vista lateral para o mar, ao lado da foto real da vista.
 6. **Planta humanizada** (clique para ampliar) e lista de ambientes.
@@ -208,7 +211,7 @@ obrigadocorretor, outroimovel, corretores) e manda endereços inexistentes para 
       e rodar o script.
 - [ ] **Rastreamento**: GTM `GTM-N2VF7FVX` e Meta Pixel `279593157240250` (os mesmos do site
       antigo) estão ativos, inclusive na prévia. Eventos enviados ao dataLayer: `lead_submit`,
-      `gallery_open`, `video_play`.
+      `gallery_open`, `video_play`, `tour_open` (clique para abrir o tour 360° nas LPs).
 
 ---
 
@@ -256,6 +259,11 @@ obrigadocorretor, outroimovel, corretores) e manda endereços inexistentes para 
 - 304: topo com a vista lateral para o mar; seção "A cobertura" com solarium e varanda gourmet;
   seção de vista com a vista a partir do solarium.
 - Cache da HostGator: o `.htaccess` impede o proxy de guardar o HTML (cabeçalho `X-Accel-Expires: 0`).
+
+### Ajustes de 08/10/2026
+
+- LPs 303 e 304: seção "Tour virtual 360°" depois da galeria, com a arte do tour como botão, item "Tour 360°" no menu,
+  nota de decorado virtual (também no rodapé) e evento `tour_open`.
 
 ### Tour 360° — sessão de 07/10/2026
 
@@ -379,7 +387,8 @@ do vidro do guarda-corpo (até 1,25 m) **não estão na planta**: são estimativ
    Visualizador: Pannellum (CDN); no celular roda só na horizontal.
 
 **Publicado (08/10/2026):** https://erichprates.github.io/ankor-site/tour-303/ e https://erichprates.github.io/ankor-site/tour-304/
-(10 ambientes refinados cada; sem link no site, sem nota de "ilustrativo" a pedido).
+(10 ambientes refinados cada; sem nota de "ilustrativo" na página do tour, a pedido). Desde 08/10/2026 as LPs das
+coberturas têm a seção que leva ao tour.
 
 **Recursos do visualizador (07/10/2026):** começa no Living virado para o terraço; pré-carrega os outros ambientes em
 segundo plano; gira sozinho a 2°/s; ao soltar depois de arrastar, a imagem segue girando para o mesmo lado na

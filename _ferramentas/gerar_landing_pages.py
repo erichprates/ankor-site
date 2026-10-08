@@ -18,7 +18,7 @@ ROOT = os.environ.get('ANKOR_ROOT') or os.path.dirname(os.path.dirname(os.path.a
 GTAG = """<script async src="https://www.googletagmanager.com/gtag/js?id=G-858ZVEWJJ1"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858ZVEWJJ1');gtag('config','AW-10869641873');</script>"""
 CONVERSAO_ADS = "<script>gtag('event','conversion',{'send_to':'AW-10869641873/pZuNCIeHxeAYEJGlhr8o'});</script>"
-V = '20260929g'
+V = '20261008b'
 SITE = 'https://construtoraconvenio.com.br/ankor/'  # endereço oficial (canonical e imagens de compartilhamento)  # versão do CSS/JS (troque ao mudar style.css ou um JS; na home também)
 
 UNITS = {
@@ -128,6 +128,7 @@ def page(u, d):
     <nav class="nav" id="menu" aria-label="Cobertura {u}">
       <a href="#destaques">Destaques</a>
       <a href="#galeria">Galeria</a>
+      <a href="#tour">Tour 360°</a>
       <a href="#vista">Vista</a>
       <a href="#planta">Planta</a>
       <a href="#faq">Dúvidas</a>
@@ -214,6 +215,24 @@ def page(u, d):
         <button class="btn btn--ghost" data-open-gallery="{u}">Ver todas as imagens</button>
         <a href="#agendar" class="btn btn--primary" data-goal="Agendar apresentação privativa">Agendar uma apresentação privativa</a>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOUR 360° (decorado virtual; a arte do botão é a mesma da prévia de compartilhamento do tour) -->
+<section class="section" id="tour">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <p class="eyebrow">Tour virtual 360°</p>
+      <h2 class="h2">Passeie pela cobertura <em>decorada</em></h2>
+      <p class="lead">Percorra cada ambiente da Cobertura {u} em 360°, do living ao deck com jacuzzi, e veja como os espaços podem ganhar vida.</p>
+    </div>
+    <a class="tour-card reveal" href="../tour-{u}/" target="_blank" rel="noopener" data-tour="{u}" aria-label="Abrir o tour virtual 360° da Cobertura {u} em uma nova aba">
+      <img src="../assets/img/og/og-tour-{u}.jpg" alt="Decorado virtual da Cobertura {u}: living e jantar em 360°" loading="lazy" width="1200" height="630">
+    </a>
+    <div class="tour-actions reveal">
+      <a href="../tour-{u}/" target="_blank" rel="noopener" class="btn btn--primary" data-tour="{u}">Iniciar o tour 360° {ARROW}</a>
+      <p>Decorado virtual: sugestão de ambientação. A unidade é entregue sem decoração. Imagens ilustrativas, que podem apresentar variações em relação aos detalhes construtivos da unidade.</p>
     </div>
   </div>
 </section>
@@ -362,7 +381,7 @@ def page(u, d):
       <a class="footer__by" href="https://construtoraconvenio.com.br" target="_blank" rel="noopener"><img src="../assets/brand/convenio.svg" alt="" width="44" height="38" loading="lazy">Construtora Convênio</a>
     </div>
     <p class="footer__addr">Av. Leovigildo Dias Vieira, 1724 · Itaguá · Ubatuba — SP</p>
-    <p class="footer__legal">Fotos reais da Cobertura {u}, entregue sem decoração. A planta humanizada é ilustrativa, com mobiliário sugerido que não faz parte da entrega. O esquema de implantação é ilustrativo e sem escala. Valor anunciado sujeito a confirmação de disponibilidade e condições vigentes. Empreendimento de uso exclusivamente residencial: não é permitida locação de temporada.</p>
+    <p class="footer__legal">Fotos reais da Cobertura {u}, entregue sem decoração. O tour virtual 360° é um decorado ilustrativo, com sugestão de ambientação, e pode apresentar variações em relação aos detalhes construtivos da unidade. A planta humanizada é ilustrativa, com mobiliário sugerido que não faz parte da entrega. O esquema de implantação é ilustrativo e sem escala. Valor anunciado sujeito a confirmação de disponibilidade e condições vigentes. Empreendimento de uso exclusivamente residencial: não é permitida locação de temporada.</p>
   </div>
 </footer>
 
