@@ -128,13 +128,7 @@
     .hint { top: 42%; }
   }
   /* ---- Celular: em vez da barra, o botão "Ambientes" abre um painel com a planta e todos os ambientes ---- */
-  /* frases enquanto o primeiro ambiente carrega */
-  .frases { position: fixed; left: 50%; bottom: calc(50% + 44px); z-index: 4; transform: translateX(-50%); width: min(640px, 88vw); text-align: center; pointer-events: none; display: none; }
-  body.carregando .frases { display: block; }
   body.trocando .pnlm-load-box { display: none !important; }
-  .frases small { display: block; margin-bottom: 14px; font-size: 11px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; color: var(--copper-light); }
-  .frases p { margin: 0; font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: clamp(24px, 3.2vw, 38px); line-height: 1.15; color: var(--peach); transition: opacity .5s; }
-  .frases p.sai { opacity: 0; }
   /* enquanto o primeiro ambiente carrega, nada de menu, planta ou avisos */
   body.carregando .dock, body.carregando .reabrir, body.carregando .rotate { visibility: hidden; }
   body.celular .rotate { display: flex; }
@@ -184,7 +178,6 @@
 <body class="carregando">
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N2VF7FVX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div id="pano"></div>
-<div class="frases" aria-hidden="true"><small>Cobertura 304 · Ankor Exclusive Residence</small><p id="frase">254 m² privativos para viver o litoral com amplitude</p></div>
 
 <header class="top">
   <div class="brand">
@@ -361,18 +354,6 @@
   document.addEventListener('fullscreenchange', function () {
     if (document.fullscreenElement && screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function () {});
   });
-  // Frases que valorizam a cobertura enquanto o primeiro ambiente carrega (dados da página da cobertura).
-  (function () {
-    var el = document.getElementById('frase'), i = 0, F = [el.textContent,
-      '3 suítes, com suíte master, para receber a família com conforto',
-      'Varanda gourmet com churrasqueira a gás',
-      'Solarium com vista para o mar e as montanhas',
-      'Na orla do Itaguá, ao lado da Marina'];
-    var t = setInterval(function () {
-      if (!document.body.classList.contains('carregando')) return clearInterval(t);
-      el.classList.add('sai'); setTimeout(function () { i = (i + 1) % F.length; el.textContent = F[i]; el.classList.remove('sai'); }, 500);
-    }, 2600);
-  })();
   var hint = document.getElementById('hint');
   ['mousedown', 'touchstart', 'keydown'].forEach(function (ev) { document.addEventListener(ev, function () { hint.classList.add('is-hidden'); }, { once: true }); });
   // Depois que o primeiro ambiente carrega: libera o menu e mostra a dica de gesto, movendo o ambiente uma vez
