@@ -388,6 +388,12 @@ uma vez ("Arraste para olhar em volta").
   "A experiência é ainda melhor no computador". Usa as imagens leves de `img/m/` (2560 px, ~200 KB; as de `img/` têm
   4096 px, ~900 KB). **Ao trocar uma imagem, gerar de novo a versão de `img/m/`** e mudar o `?v=` em `src()`.
 - Campo de visão: 110° deitado/computador e 75° em pé, definido antes de carregar (só muda se girar o aparelho).
+- **Carregamento em duas etapas:** todo ambiente abre pela imagem leve de `img/m/`; no computador a de 4096 px carrega em
+  seguida e entra por cima com fade (cenas `<id>_hd`; a função `atual()` devolve o ambiente sem o sufixo). No celular fica
+  só a leve. A primeira imagem tem `<link rel="preload">` no `<head>` (o `?v=` dele tem de ser o mesmo de `src()`).
+- **Frases no carregamento** (`.frases`, só no primeiro ambiente): área, suítes, varanda gourmet, solarium e localização,
+  com os mesmos dados das páginas das coberturas. Não escrever "de frente para o mar": a cobertura é posterior.
+- No celular não há controles do visualizador na tela (zoom com dois dedos; tela cheia não funciona no iPhone).
 - Pontos na planta: os das suítes ficam do lado da janela, afastados dos de WC, para facilitar o toque.
 
 **Ajustes no modelo em 07/10/2026:** vista real como mundo; o painel de pedra do muro do terraço é a **ducha externa**: voltou ao modelo com braço, ducha e
