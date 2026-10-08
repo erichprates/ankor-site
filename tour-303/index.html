@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#2e2f2a">
 <link rel="icon" href="../assets/brand/favicon.png">
-<link rel="preload" as="image" href="img/m/living.webp?v=20261008b">
+<link rel="preload" as="image" href="img/m/living.webp?v=20261008c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
@@ -232,7 +232,7 @@
   // Toda imagem abre primeiro na versão leve (2560 px, ~200 KB). No computador, a de 4096 px carrega em seguida e
   // entra por cima com um fade (cena <id>_hd): o tour aparece ~4x mais rápido e a nitidez final é a mesma.
   var LEVE = window.matchMedia('(pointer: coarse) and (max-width: 950px), (pointer: coarse) and (max-height: 520px)').matches;
-  function src(id, hd) { return 'img/' + (hd && !LEVE ? '' : 'm/') + id + '.webp?v=20261008b'; }
+  function src(id, hd) { return 'img/' + (hd && !LEVE ? '' : 'm/') + id + '.webp?v=20261008c'; }
 
   var scenes = {};
   ROOMS.forEach(function (r) { [false, true].forEach(function (hd) {
@@ -270,21 +270,34 @@
     };
     im.src = src(cena, true);
   });
-  // Ao soltar depois de arrastar, a imagem desliza um pouco (friction) e segue girando devagar para o MESMO lado.
+  // Ao soltar depois de arrastar, a imagem segue girando para o MESMO lado, na velocidade do gesto: arrasto rápido
+  // gira rápido e vai freando; arrasto lento segue devagar. No fim assenta no giro calmo de 2°/s.
   (function () {
-    var pano = document.getElementById('pano'), y0 = null, timer = null;
-    pano.addEventListener('pointerdown', function () { y0 = viewer.getYaw(); arrastando = true; clearTimeout(timer); });
+    var pano = document.getElementById('pano'), y0 = null, amostras = [], timer = null;
+    function para() { clearTimeout(timer); clearInterval(timer); }
+    pano.addEventListener('pointerdown', function () { y0 = viewer.getYaw(); amostras = []; arrastando = true; para(); });
+    pano.addEventListener('pointermove', function () {
+      if (y0 === null) return;
+      amostras.push([performance.now(), viewer.getYaw()]); if (amostras.length > 12) amostras.shift();
+    });
     document.addEventListener('pointerup', function () {
       arrastando = false;
       if (y0 === null) return;
       var d = ((viewer.getYaw() - y0 + 540) % 360) - 180; y0 = null;
       if (Math.abs(d) < 3) return;                                  // foi um toque, não um arrasto
-      var sinal = d > 0 ? -1 : 1;
-      // segue a 6°/s logo depois do deslize e, passados 6 s, volta ao giro calmo de 2°/s (no mesmo sentido)
-      timer = setTimeout(function () {
-        girar(6 * sinal);
-        timer = setTimeout(function () { girar(2 * sinal); }, 6000);
-      }, 600);
+      // velocidade do gesto (graus por segundo) nos últimos ~150 ms antes de soltar
+      var agora = performance.now(), ult = amostras[amostras.length - 1], ini = ult;
+      for (var i = amostras.length - 1; i >= 0 && agora - amostras[i][0] < 150; i--) ini = amostras[i];
+      var dt = ult && ini ? (ult[0] - ini[0]) / 1000 : 0;
+      var v = dt > 0.02 ? Math.abs((((ult[1] - ini[1] + 540) % 360) - 180) / dt) : 0;
+      var sinal = d > 0 ? -1 : 1, v0 = Math.max(2, Math.min(30, v * 0.3)), t0 = agora;
+      timer = setTimeout(function () {                              // depois do deslize inicial do próprio visualizador
+        timer = setInterval(function () {
+          var vel = 2 + (v0 - 2) * Math.exp(-(performance.now() - t0) / 2200);
+          girar(vel * sinal);
+          if (vel < 2.15) { clearInterval(timer); girar(2 * sinal); }
+        }, 120);
+      }, 350);
     });
   })();
   var rooms = document.getElementById('rooms'), map = document.getElementById('map');

@@ -379,8 +379,8 @@ do vidro do guarda-corpo (até 1,25 m) **não estão na planta**: são estimativ
 (10 ambientes refinados cada; sem link no site, sem nota de "ilustrativo" a pedido).
 
 **Recursos do visualizador (07/10/2026):** começa no Living virado para o terraço; pré-carrega os outros ambientes em
-segundo plano; gira sozinho a 2°/s; ao soltar depois de arrastar, a imagem desliza e segue girando para o mesmo lado
-(6°/s por 6 s, depois 2°/s). Menu e avisos só aparecem depois do carregamento; ao carregar, uma mão animada move o ambiente
+segundo plano; gira sozinho a 2°/s; ao soltar depois de arrastar, a imagem segue girando para o mesmo lado na
+velocidade do gesto (30% da velocidade do arrasto, até 30°/s) e freia até assentar em 2°/s. Menu e avisos só aparecem depois do carregamento; ao carregar, uma mão animada move o ambiente
 uma vez ("Arraste para olhar em volta").
 - **Computador:** barra de ambientes no rodapé (setas quando não cabe, botão de esconder) com a planta ao lado; zoom e tela cheia.
 - **Celular (em pé ou deitado, sem obrigar a girar):** só o botão "Ambientes", que abre um painel com a planta e os dez
