@@ -6,7 +6,8 @@ renderiza panoramas equirretangulares e vistas em perspectiva.
 
 Uso:
   /Applications/Blender.app/Contents/MacOS/Blender -b -P cena_living.py -- \
-      --out <pasta> [--samples 256] [--res 4096] [--only living_360,cozinha_360] [--save cena.blend]
+      --out <pasta> [--samples 256] [--res 4096] [--only living_360,cozinha_360] [--save cena.blend] [--apto 304]
+  Só gerar o arquivo .blend completo, sem renderizar:  ... -- --apto 303 --only nenhum --save cobertura303.blend
 
 Coordenadas: "planta" em metros, origem no canto interno sup-esq do living
 (parede da suíte 3 x fachada frontal). x cresce para a direita, y cresce para
@@ -1021,6 +1022,8 @@ if APTO == '304':      # terraço e deck da 304 têm outra planta: pontos própr
     SHOTS['deck_360']['loc'] = (13.9, 2.55, 1.6)
 for name, s in SHOTS.items():
     if ONLY and name not in ONLY:
+        if SAVE:      # no .blend ficam as câmeras de todos os pontos do tour, mesmo sem renderizar
+            camera(name, s['loc'], s['rot'], s.get('pano', False), s.get('lens', 20))
         continue
     cam = camera(name, s['loc'], s['rot'], s.get('pano', False), s.get('lens', 20))
     scene.view_settings.exposure = s.get('exposure', 1.1)
@@ -1043,5 +1046,9 @@ for name, s in SHOTS.items():
     bpy.ops.render.render(write_still=True)
 
 if SAVE:
+    try:
+        bpy.ops.file.pack_all()      # leva as imagens (paisagem) dentro do arquivo, para abrir em qualquer máquina
+    except Exception as e:
+        print('pack_all:', e)
     bpy.ops.wm.save_as_mainfile(filepath=SAVE)
 print('FIM', flush=True)
