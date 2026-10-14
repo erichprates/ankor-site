@@ -298,23 +298,27 @@ for (cx_, cy_) in ((-4.23, 2.89), (-3.86, 2.89), (-4.23, 3.26), (-3.86, 3.26)):
 box('s2_fundo', S2[0], -4.4, 5.25, 5.35, 0, H, M['wall'])
 box('s2_porta', -5.05, -4.45, 5.23, 5.25, 0, DOOR, M['wood'])
 
-# ---- suíte 1 (master, ponta): 2,70 x 6,35, cabeceira na empena, banho no fundo à esquerda
+# ---- suíte 1 (master, ponta): 2,70 x 6,35, banho no fundo à esquerda
+# cabeceira na divisória com a suíte 2 e TV na empena (pedido do cliente em 14/10/2026: é a posição do projeto;
+# a planta humanizada mostra a cama na empena)
 box('suite_piso', S1[0], S1[1], 3.75, 6.35, 0.0, Z0, M['vinilico'])
-suite(*S1, 3.75, -1, COR_S1, 2.0, pendente=True)
+S1_BED_Y = 2.0                     # cama: deixa espaço para o ponto do tour entre ela e o banho
+S1_TV_Y = 2.2                      # TV um pouco para o fundo, para o canto de leitura caber junto à janela
+suite(*S1, 3.75, +1, COR_S1, S1_BED_Y, pendente=True)
 box('suite_forro_fundo', S1[0], S1[1], BATH_Y1, 6.5, H - 0.03, H - 0.02, M['plaster_white'])
 banho(-8.65, -7.35, -1, 'topo', M['azulejo_azul'])
 # decoração da master (sem bancada, a pedido): painel ripado iluminado atrás da cama, pendentes de latão,
-# painel de TV em madeira escura com rack suspenso e canto de leitura junto à janela
-box('painel_ripado_s1', S1[0] + 0.02, S1[0] + 0.045, 0.2, 3.75, 0, 2.5, M['slat'] if APTO == '303' else M['parede_areia'])
-box('sanca_led_s1', S1[0] + 0.02, S1[0] + 0.06, 0.2, 3.75, 2.5, 2.52, M['led_branco'])
-box('painel_tv_s1', S1[1] - 0.04, S1[1], 1.5, 3.7, 0.0, H - 0.03, M['wood_dark'])
-box('rack_s1', S1[1] - 0.3, S1[1] - 0.04, 1.6, 3.6, 0.3, 0.5, M['wood_dark'])
-box('tv_s1', S1[1] - 0.07, S1[1] - 0.04, 2.0, 3.2, 1.0, 1.7, M['black_glass'])
-cyl('vaso_rack_s1', S1[1] - 0.17, 1.85, 0.5, 0.72, 0.06, M['ceramic'])
-armchair(-6.5, 0.75, +1)
+# painel de TV em madeira escura com rack suspenso na empena e canto de leitura junto à janela
+box('painel_ripado_s1', S1[1] - 0.045, S1[1] - 0.02, 0.2, 3.75, 0, 2.5, M['slat'] if APTO == '303' else M['parede_areia'])
+box('sanca_led_s1', S1[1] - 0.06, S1[1] - 0.02, 0.2, 3.75, 2.5, 2.52, M['led_branco'])
+box('painel_tv_s1', S1[0], S1[0] + 0.04, S1_TV_Y - 1.2, S1_TV_Y + 1.2, 0.0, H - 0.03, M['wood_dark'])
+box('rack_s1', S1[0] + 0.04, S1[0] + 0.3, S1_TV_Y - 1.1, S1_TV_Y + 1.1, 0.3, 0.5, M['wood_dark'])
+box('tv_s1', S1[0] + 0.04, S1[0] + 0.07, S1_TV_Y - 0.6, S1_TV_Y + 0.6, 1.0, 1.7, M['black_glass'])
+cyl('vaso_rack_s1', S1[0] + 0.17, S1_TV_Y - 0.85, 0.5, 0.72, 0.06, M['ceramic'])
+armchair(-8.05, 0.62, +1)
 if APTO == '304':
-    oliveira(-6.2, 1.35, h=1.8)
-# quadros na parede da direita: um de cada lado do painel da TV e outro mais perto da porta de entrada
+    oliveira(-6.3, 0.52, h=1.8)    # no canto da janela do lado da cama
+# quadros: parede da direita depois da cabeceira, perto da porta de entrada
 def quadro_parede_x(xw, lado, yc, zc, larg, alt, tela, mold=None):
     """Quadro numa parede de x constante; lado = -1 se a face visível olha para x menor."""
     p = lambda d: xw + lado * d
@@ -322,22 +326,21 @@ def quadro_parede_x(xw, lado, yc, zc, larg, alt, tela, mold=None):
                                    ('quadro_tela', 0.028, 0.031, tela, 0.09)):
         xa, xb = sorted((p(d0), p(d1)))
         box(nome, xa, xb, yc - larg / 2 + folga, yc + larg / 2 - folga, zc - alt / 2 + folga, zc + alt / 2 - folga, m)
-# parede atrás da cama: tela horizontal grande sobre a cabeceira, ladeada por duas arandelas, e prateleira com objetos
-quadro_parede_x(S1[0] + 0.045, +1, 2.0, 1.88, 1.9, 0.8,
+# parede atrás da cama: tela horizontal grande sobre a cabeceira, ladeada por duas arandelas
+quadro_parede_x(S1[1] - 0.045, -1, S1_BED_Y, 1.88, 1.9, 0.8,
                 arte('tela_s1_cama', ('#efe7da', '#d8c7ad', '#b08a4e', '#3a2f28') if APTO == '303' else TELA_MAR, escala=1.1, seed=58.0),
                 mold=M['brass'] if APTO == '303' else M['wood'])
-for ya_ in (0.72, 3.28):
-    box('arandela_base', S1[0] + 0.045, S1[0] + 0.06, ya_ - 0.04, ya_ + 0.04, 1.7, 2.0, M['brass'])
-    cyl('arandela_luz', S1[0] + 0.1, ya_, 1.78, 1.94, 0.035, M['abajur'])
-    luz(S1[0] + 0.2, ya_, 1.86, 2.0)
+for ya_ in (S1_BED_Y - 1.28, S1_BED_Y + 1.28):
+    box('arandela_base', S1[1] - 0.06, S1[1] - 0.045, ya_ - 0.04, ya_ + 0.04, 1.7, 2.0, M['brass'])
+    cyl('arandela_luz', S1[1] - 0.1, ya_, 1.78, 1.94, 0.035, M['abajur'])
+    luz(S1[1] - 0.2, ya_, 1.86, 2.0)
 if APTO == '304':      # 304: cabeceira em palha natural, como nas referências
-    box('cabeceira_palha', S1[0] + 0.08, S1[0] + 0.095, 0.62, 3.38, 0.32, 1.23, M['cane'])
-quadro_parede_x(S1[1], -1, 0.9, 1.6, 0.6, 0.85, arte('tela_s1c', ('#efe7da', '#c9b79c', '#7d6a55', '#2f3b3a') if APTO == '303' else TELA_MAR, seed=47.0))
+    box('cabeceira_palha', S1[1] - 0.095, S1[1] - 0.08, S1_BED_Y - 1.38, S1_BED_Y + 1.38, 0.32, 1.23, M['cane'])
 quadro_parede_x(S1[1], -1, 4.3, 1.55, 0.6, 0.85, arte('tela_s1a', ('#efe7da', '#cdb89a', '#9a7b5a', '#3a2f28') if APTO == '303' else TELA_PRAIA, seed=21.0))
 quadro_parede_x(S1[1], -1, 5.25, 1.55, 0.6, 0.85, arte('tela_s1b', ('#efe7da', '#d8c7ad', '#b08a4e', '#5a4636') if APTO == '303' else TELA_MAR, seed=34.0))
-cyl('mesa_lateral_s1', -7.05, 0.5, 0.0, 0.5, 0.17, M['brass'])
-cyl('luminaria_s1_haste', -6.1, 0.35, 0.0, 1.45, 0.01, M['black'])
-cyl('luminaria_s1_cupula', -6.1, 0.35, 1.45, 1.65, 0.11, M['abajur'])
+cyl('mesa_lateral_s1', -7.45, 0.45, 0.0, 0.5, 0.17, M['brass'])
+cyl('luminaria_s1_haste', -8.5, 0.35, 0.0, 1.45, 0.01, M['black'])
+cyl('luminaria_s1_cupula', -8.5, 0.35, 1.45, 1.65, 0.11, M['abajur'])
 armario(-7.25, -6.7, 4.75, 6.3)
 box('s1_fundo', S1[0], S1[1], 6.35, 6.5, 0, H, M['wall'])
 box('s1_porta', -6.65, -6.0, 6.33, 6.35, 0, DOOR, M['wood'])

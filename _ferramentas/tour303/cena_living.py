@@ -1005,7 +1005,7 @@ SHOTS = {
     # enxerga, pelo vidro, abaixo de onde as fotos da vista terminam (~35° abaixo do horizonte).
     'deck_360':    dict(loc=(12.15, 1.78, 1.6), rot=(90, 0, 90), pano=True, exposure=-0.6, mundo='paisagem_360_real_deck.png'),
     # quartos: se existir a vista própria das janelas (vista_real.py 30X_quartos), ela é o mundo; senão vale a geral
-    'suite1_360':  dict(loc=(-6.85, 3.25, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5, mundo='paisagem_360_real_quartos.png'),
+    'suite1_360':  dict(loc=(-6.9, 3.3, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5, mundo='paisagem_360_real_quartos.png'),
     'suite2_360':  dict(loc=(-4.9, 3.05, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5, mundo='paisagem_360_real_quartos.png'),
     'suite3_360':  dict(loc=(-1.95, 3.2, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5, mundo='paisagem_360_real_quartos.png'),
     'banho1_360':  dict(loc=(-8.0, 4.75, 1.6), rot=(90, 0, 90), pano=True, exposure=0.5, mundo='paisagem_360_real_quartos.png'),
@@ -1015,6 +1015,9 @@ SHOTS = {
     'living_persp':  dict(loc=(4.2, 4.6, 1.35), rot=(84, 0, 128), lens=16),
     'cozinha_persp': dict(loc=(0.9, 5.6, 1.4), rot=(80, 0, -145), lens=17),
 }
+if APTO == '304':      # master e WC master: paisagem girada para aparecer mais a praia pela janela (pedido de 14/10/2026)
+    for k_ in ('suite1_360', 'banho1_360'):
+        SHOTS[k_]['giro_mundo'] = float(arg('--giro', -35))   # negativo = paisagem vai para a esquerda
 if APTO == '304':      # terraço e deck da 304 têm outra planta: pontos próprios (afastados dos guarda-corpos)
     for k_ in ('living_360', 'cozinha_360'):      # mesma fachada dos quartos: mesma paisagem (ver vista_real.py)
         SHOTS[k_]['mundo'] = 'paisagem_360_real_quartos.png'
@@ -1033,6 +1036,13 @@ for name, s in SHOTS.items():
         env.image = bpy.data.images.load(mundo)
     elif env:
         env.image = bpy.data.images.load(PAISAGEM, check_existing=True)
+    if env and not MUNDO_PROVISORIO:      # giro da paisagem só neste ponto (campo `giro_mundo`, graus)
+        if not env.inputs['Vector'].links:
+            tcg = world.node_tree.nodes.new('ShaderNodeTexCoord'); mpg = world.node_tree.nodes.new('ShaderNodeMapping')
+            mpg.vector_type = 'VECTOR'; mpg.name = 'giro_mundo'
+            world.node_tree.links.new(tcg.outputs['Generated'], mpg.inputs['Vector'])
+            world.node_tree.links.new(mpg.outputs['Vector'], env.inputs['Vector'])
+        world.node_tree.nodes['giro_mundo'].inputs['Rotation'].default_value = (0, 0, math.radians(s.get('giro_mundo', 0.0)))
     if s.get('pano'):
         scene.render.resolution_x, scene.render.resolution_y = RES, RES // 2
     else:

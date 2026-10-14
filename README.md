@@ -299,6 +299,16 @@ obrigadocorretor, outroimovel, corretores) e manda endereços inexistentes para 
 - Contentsquare (antigo Hotjar) reinstalado nas 7 páginas, com a tag `3d94dfe17b9cd` (ver "Rastreamento", seção 4).
 - Publicação automática por SFTP com `_ferramentas/publicar.py`, sem subir zip à mão (ver seção 5).
 
+### Ajustes de 14/10/2026
+
+- Tour 360°, suíte master das duas coberturas: a cama passou para a parede da suíte 2 (posição do projeto; a planta
+  humanizada mostra a cama na empena) e a TV foi para a empena. Cama 20 cm mais perto da janela para caber o ponto do
+  tour entre ela e o WC; o canto de leitura ficou junto à janela, do lado da TV. A vista abre virada para a sacada.
+  Suíte master e WC master (o WC mostra o quarto pela porta e pelo espelho) refeitos e refinados com as versões
+  aprovadas como referência de estilo.
+- 304, suíte master e WC master: paisagem girada 35° para a esquerda (campo `giro_mundo` no `cena_living.py`) para
+  aparecer mais a praia pela janela.
+
 ### Tour 360° — sessão de 07/10/2026
 
 - **Vista real** das coberturas como paisagem do 3D (panorâmica do terraço, versão ampla; no deck, a versão que pega o mar).
@@ -368,6 +378,9 @@ retoque manual do cliente no Photoshop.
   usar a imagem inteira da edição ou gerar de novo; montagens pequenas ficaram visíveis e o cliente rejeitou.
 
 **Regras aprendidas (valem para a 304):**
+- Emenda lateral em cima de móvel ou painel (aconteceu na master depois da troca da cama): girar o render antes de
+  refinar para a emenda cair numa parede lisa e desfazer o giro no resultado (`ImageChops.offset`, 1/4 de volta).
+- Giro da paisagem só num ponto: `giro_mundo` (graus) no `SHOTS`; negativo leva a paisagem para a esquerda.
 - Ponto do tour a menos de ~1,8 m de um guarda-corpo de vidro enxerga, pelo vidro, abaixo de onde a foto da vista termina
   (~35° abaixo do horizonte) e aparece uma faixa embaçada. Afastar o ponto ou pedir foto com mais área para baixo.
 - A câmera não pode ficar na linha de uma parede: a porta que está nela some (aconteceu com o WC da master).
